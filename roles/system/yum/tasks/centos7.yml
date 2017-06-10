@@ -1,0 +1,72 @@
+#- name: Remove repository from a specific repo file
+#  yum_repository:
+#    name: centos7
+#    file: xxxx-TN
+#    state: absent   
+#
+#
+- name: Clean yum cache
+  shell: yum clean all
+  changed_when: False
+  tags:
+    - install-aliyum
+
+#- name: yum remove epel-release
+#  yum:
+#    name: "{{ item }}"
+#    state: absent
+#  with_items: "{{ extra_repository }}"
+#  tags:
+#    - epel-remove
+- name: yum remove epel-release
+  command: "yum autoremove -y {{ item }}"
+  with_items: "{{ extra_repository }}"
+  tags:
+    - epel-remove
+
+- name: create a directory if it doesn't exist
+  file:
+    path: /etc/yum.repos.d/_b
+    state: directory
+    mode: 0755
+  tags:
+    - repo-backup
+
+- name: backup the old repo 
+  shell: mv /etc/yum.repos.d/*.repo /etc/yum.repos.d/_b
+  tags:
+    - repo-backup
+
+- name: Configure additional repos in /etc/yum.repos.d/
+  template:
+    src: CentOS-aliyum.repo.j2
+    dest: /etc/yum.repos.d/CentOS-aliyum.repo
+  tags:
+    - install-aliyum
+  #  notify:
+  #  - Delete unmanaged repos
+  #
+
+- name: yum install epel-release
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ extra_repository }}"
+  tags:
+    - epel-install
+
+- name: upgrade all packages
+  yum:
+    name: '*'
+    state: latest
+  tags:
+    - yum-update
+
+- name: yum install packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ extra_packages }}"
+  tags:
+    - yum-install-packages
+

@@ -1,0 +1,9 @@
+---
+
+
+openstackclient_developer_mode: "{{ developer_mode }}"
+
+openstackclient_git_clone_dir: "{{ git_clone_dir }}/python-openstackclient"
+openstackclient_version: stable/{{ openstack_release }}
+
+

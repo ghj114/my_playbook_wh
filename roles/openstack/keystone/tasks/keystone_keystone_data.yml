@@ -1,0 +1,13 @@
+---
+
+- name: Delete the keystone data
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+      - "{{ openstack_bin }} {{keystone_admin_env}} project delete service"
+
+- name: Create the keystone data
+  command: "{{ item }}"
+  with_items:
+      - "{{ openstack_bin }} {{keystone_admin_env}} project create --domain default --description 'Service Project' service"
+

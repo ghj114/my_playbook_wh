@@ -1,0 +1,129 @@
+---
+# tasks file for roles/openstack/keystone
+#
+- include: keystone_venv_install.yml
+  static: no
+  when: keystone_developer_mode | bool
+  tags:
+    - keystone-developer-install
+
+- include: keystone_config.yml
+  static: no
+  tags:
+    - keystone-config
+
+- include: keystone_db_sync.yml
+  static: no
+  when: inventory_hostname in groups['controller']
+  tags:
+    - keystone-db-sync
+
+
+- include: keystone_start.yml
+  static: no
+  when: inventory_hostname in groups['controller']
+  tags:
+    - keystone-start
+
+- include: keystone_keystone_data.yml
+  static: no
+  when: inventory_hostname in groups['controller']
+  tags:
+    - keystone-keystone-data
+
+
+#- name: Create a new database with name 'keystone'
+#  mysql_db:
+#    name: keystone
+#    login_password: xxxx.123
+#    state: present
+#
+#- name: Grant access to the DB for the service
+#  mysql_user:
+#    login_user: root
+#    login_password: xxxx.123
+#    name: keystone
+#    password: keystone
+#    host: "{{ item }}"
+#    state: "present"
+#    priv: "keystone.*:ALL"
+#  with_items:
+#    - localhost
+#    - "%"
+#  tags:
+#    - keysteon-mysql
+#
+#- name: Keystone pip Install 
+#  pip:
+#    name: "{{item}}"
+#  with_items:
+#    - tox
+#  tags:
+#    - key-pip
+#
+#- name: Git clone keystone code
+#  git:
+#    repo: https://git.openstack.org/openstack/keystone.git
+#    dest: /root/workspace/openstack/src/keystone
+#    version: stable/ocata
+#    update: no
+#  tags:
+#    - git-keystone
+#
+#- name: tox
+#  command: tox -e py27 --notest
+#  args:
+#    chdir: /root/workspace/openstack/src/keystone
+#  tags:
+#    - tox
+#
+#- name: Copy keystone conf file
+#  command: cp keystone.conf.sample keystone.conf
+#  args:
+#    chdir: /root/workspace/openstack/src/keystone/etc
+#  tags:
+#    - tox
+#
+#- name: Keystone conf file
+#  ini_file:
+#    path: /root/workspace/openstack/src/keystone/etc/keystone.conf
+#    section: "{{ item.section }}"
+#    option: "{{ item.option }}"
+#    value: "{{ item.value }}"
+#  with_items:
+#    - { section: "database", option: "connection", value: "mysql+pymysql://keystone:keystone@{{ groups['controller'][0] }}/keystone" } 
+#    - { section: "token", option: "provider", value: "fernet" }
+#  tags:
+#    - conf
+#
+#- name: Keystone database sync
+#  command: "{{ item }}"
+#  with_items:
+#    - "{{ venv }}/keystone-manage --config-file {{ conf_path }}/keystone.conf db_sync"
+#    - "{{ venv }}/keystone-manage --config-file {{ conf_path }}/keystone.conf fernet_setup --keystone-user root --keystone-group root" 
+#    - "{{ venv }}/keystone-manage --config-file {{ conf_path }}/keystone.conf bootstrap --bootstrap-password admin \
+#                                 --bootstrap-admin-url http://{{ groups['controller'][0] }}:35357/v3/ \
+#                                 --bootstrap-internal-url http://{{ groups['controller'][0] }}:5000/v3/ \
+#                                 --bootstrap-public-url http://{{ groups['controller'][0] }}:5000/v3/ \
+#                                 --bootstrap-region-id RegionOne"
+#  tags:
+#    - keystone-manage
+#
+#- name: "Running keystone use uwsgi in tmux"
+#  command: "{{ item }}"
+#  vars:
+#  with_items:
+#    - "{{ venv }}/pip install uwsgi"
+#    - tmux new -d -n admin -s keystone '/bin/sh -c "{{ venv }}/uwsgi --http :35357 --wsgi-file {{ venv}}/keystone-wsgi-admin;exec bash"'
+#    - tmux neww -n public -t keystone '/bin/sh -c "{{ venv }}/uwsgi --http :5000 --wsgi-file {{ venv}}/keystone-wsgi-admin;exec bash"'
+#  tags:
+#    - run-keystone
+#
+#- name: Create the keystone data
+#  command: "{{ item }}"
+#  with_items:
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} project create --domain default --description 'Service Project' service"
+#  tags:
+#    - keystone-create
+#
+

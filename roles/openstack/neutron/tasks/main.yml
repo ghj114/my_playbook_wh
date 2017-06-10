@@ -1,0 +1,314 @@
+---
+
+- include: neutron_venv_install.yml
+  static: no
+  when: neutron_developer_mode | bool
+  tags:
+    - neutron-developer-install
+
+- include: neutron_yum_install.yml
+  static: no
+  when: neutron_developer_mode | bool == false
+  tags:
+    - neutron-yum-install
+
+- include: neutron_config.yml
+  static: no
+  tags:
+    - neutron-config
+
+- include: neutron_db_sync.yml
+  static: no
+  when: inventory_hostname in groups['controller']
+  tags:
+    - neutron-db-sync
+
+
+- include: neutron_keystone_data.yml
+  static: no
+  when: inventory_hostname in groups['controller']
+  tags:
+    - neutron-keystone-data
+
+- include: neutron_start.yml
+  static: no
+  when: neutron_developer_mode | bool
+  tags:
+    - neutron-start
+
+- include: neutron_yum_start.yml
+  static: no
+  when: neutron_developer_mode | bool == false
+  tags:
+    - neutron-yum-start
+
+# tasks file for roles/openstack/neutron
+#
+#- name: Delete databases
+#  mysql_db:
+#    name: "{{ item }}"
+#    login_password: xxxx.123
+#    state: absent
+#  with_items:
+#    - neutron
+#  tags:
+#    - neutron-mysql
+#    - neutron-mysql-delete
+#  when: inventory_hostname in groups['controller']
+#
+#
+#- name: Create a new database with name 'neutron'
+#  mysql_db:
+#    name: "{{ item }}"
+#    login_password: xxxx.123
+#    state: present
+#  with_items:
+#    - neutron
+#  tags:
+#    - neutron-mysql
+#  when: inventory_hostname in groups['controller']
+#
+#- name: Grant access to the DB neutron for the service
+#  mysql_user:
+#    login_user: root
+#    login_password: xxxx.123
+#    name: neutron
+#    password: neutron 
+#    host: "{{ item }}"
+#    state: "present"
+#    priv: "neutron.*:ALL"
+#  with_items:
+#    - "localhost"
+#    - "%"
+#  tags:
+#    - neutron-mysql
+#  when: inventory_hostname in groups['controller']
+#
+#- name: neutron pip Install 
+#  pip:
+#    name: "{{item}}"
+#  with_items:
+#    - tox
+#  tags:
+#    - neutron-pip
+#
+#- name: Delete the neutron data
+#  command: "{{ item }}"
+#  ignore_errors: true
+#  with_items:
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} user delete neutron"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} service delete neutron"
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - neutron-mysql
+#
+#- name: Create the neutron data
+#  command: "{{ item }}"
+#  with_items:
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} user create --domain default --password neturon neutron"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} role add --project service --user neutron admin"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} service create --name neutron --description 'OpenStack Networking' network"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} endpoint create --region RegionOne network public http://{{groups['controller'][0]}}:9696"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} endpoint create --region RegionOne network internal http://{{groups['controller'][0]}}:9696"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} endpoint create --region RegionOne network admin http://{{groups['controller'][0]}}:9696"
+#  tags:
+#    - neutron-mysql
+#  when: inventory_hostname in groups['controller']
+
+#- name: Git clone neutron code
+#  git:
+#    repo: https://git.openstack.org/openstack/neutron.git
+#    dest: /root/workspace/openstack/src/neutron
+#    version: stable/ocata
+#    update: no
+#  tags:
+#    - neutron-git
+#
+#- name: tox
+#  command: tox -e py27 --notest
+#  args:
+#    chdir: /root/workspace/openstack/src/neutron
+#  tags:
+#    - tox
+
+#- name: Neutron conf file
+#  ini_file:
+#    path: /root/workspace/openstack/src/neutron/etc/neutron/neutron.conf
+#    section: "{{ item.section }}"
+#    option: "{{ item.option }}"
+#    value: "{{ item.value }}"
+#  with_items:
+#    - { section: "database", option: "connection", value: "mysql+pymysql://neutron:neutron@{{ groups['controller'][0] }}/neutron" } 
+#    - { section: "DEFAULT", option: "core_plugin", value: "ml2" } 
+#    - { section: "DEFAULT", option: "service_plugins", value: "" } 
+#    - { section: "DEFAULT", option: "transport_url", value: "rabbit://openstack:openstack@{{ groups['controller'][0] }}" } 
+#    - { section: "DEFAULT", option: "auth_strategy", value: "keystone" } 
+#    - { section: "keystone_authtoken", option: "auth_uri", value: "http://{{ groups['controller'][0] }}:5000" }
+#    - { section: "keystone_authtoken", option: "auth_url", value: "http://{{ groups['controller'][0] }}:35357" }
+#    - { section: "keystone_authtoken", option: "memcached_servers", value: "{{ groups['controller'][0] }}:11211" }
+#    - { section: "keystone_authtoken", option: "auth_type", value: "password" }
+#    - { section: "keystone_authtoken", option: "project_domain_name", value: "default" }
+#    - { section: "keystone_authtoken", option: "user_domain_name", value: "default" }
+#    - { section: "keystone_authtoken", option: "project_name" , value: "service" }
+#    - { section: "keystone_authtoken", option: "username", value: "neutron" }
+#    - { section: "keystone_authtoken", option: "password", value: "neutron" }
+#    - { section: "DEFAULT", option: "notify_nova_on_port_status_changes", value: "true" } 
+#    - { section: "DEFAULT", option: "notify_nova_on_port_data_changes", value: "true" } 
+#    - { section: "nova", option: "auth_url", value: "http://{{ groups['controller'][0] }}:35357" } 
+#    - { section: "nova", option: "auth_type", value: "password" }
+#    - { section: "nova", option: "project_domain_name", value: "default" }
+#    - { section: "nova", option: "user_domain_name", value: "default" }
+#    - { section: "nova", option: "region_name", value: "RegionOne" }
+#    - { section: "nova", option: "project_name" , value: "service" }
+#    - { section: "nova", option: "username", value: "nova" }
+#    - { section: "nova", option: "password", value: "nova" }
+#    - { section: "oslo_concurrency", option: "lock_path", value: "/var/lib/neutron/tmp" } 
+#  tags:
+#    - neutron-conf
+#
+#- name: Neutron ml2 conf file
+#  ini_file:
+#    path: /root/workspace/openstack/src/neutron/etc/neutron/plugins/ml2_conf.ini
+#    section: "{{ item.section }}"
+#    option: "{{ item.option }}"
+#    value: "{{ item.value }}"
+#  with_items:
+#    - { section: "ml2", option: "type_drivers", value: "flat,vlan" } 
+#    - { section: "ml2", option: "tenant_network_types", value: "" } 
+#    - { section: "ml2", option: "mechanism_drivers", value: "linuxbridge" } 
+#    - { section: "ml2", option: "extension_drivers", value: "port_security" } 
+#    - { section: "ml2_type_flat", option: "flat_networks", value: "provider" } 
+#    - { section: "securitygroup", option: "enable_ipset", value: "true" } 
+#  tags:
+#    - neutron-conf
+#
+#- name: Neutron agent conf file
+#  ini_file:
+#    path: /root/workspace/openstack/src/neutron/etc/neutron/plugins/linuxbridge_agent.ini
+#    section: "{{ item.section }}"
+#    option: "{{ item.option }}"
+#    value: "{{ item.value }}"
+#  with_items:
+#    - { section: "linux_bridge", option: "physical_interface_mappings", value: "provider:br-provider" } 
+#    - { section: "vxlan", option: "enable_vxlan", value: "false" } 
+#    - { section: "securitygroup", option: "enable_security_group", value: "true" } 
+#    - { section: "securitygroup", option: "firewall_driver", value: "neutron.agent.linux.iptables_firewall.IptablesFirewallDriver" } 
+#  tags:
+#    - neutron-conf
+#
+#- name: Neutron DHCP conf file
+#  ini_file:
+#    path: /root/workspace/openstack/src/neutron/etc/neutron/dhcp_agent.ini
+#    section: "{{ item.section }}"
+#    option: "{{ item.option }}"
+#    value: "{{ item.value }}"
+#  with_items:
+#    - { section: "DEFAULT", option: "interface_driver", value: "linuxbridge" } 
+#    - { section: "DEFAULT", option: "dhcp_driver", value: "neutron.agent.linux.dhcp.Dnsmasq" } 
+#    - { section: "DEFAULT", option: "enable_isolated_metadata", value: "true" } 
+#  tags:
+#    - neutron-conf
+#
+#- name: Neutron metadata conf file
+#  ini_file:
+#    path: /root/workspace/openstack/src/neutron/etc/neutron/metadata_agent.ini
+#    section: "{{ item.section }}"
+#    option: "{{ item.option }}"
+#    value: "{{ item.value }}"
+#  with_items:
+#    - { section: "DEFAULT", option: "nova_metadata_ip", value: "{{ groups['controller'][0] }}" } 
+#    - { section: "DEFAULT", option: "metadata_proxy_shared_secret", value: "" } 
+#  tags:
+#    - neutron-conf
+#
+#
+#
+#- name: Neutron database sync
+#  command: "{{ item }}"
+#  with_items:
+#    - "{{ venv }}/neutron-db-manage --config-file {{ conf_path }}/neutron.conf --config-file {{ ml2_conf_path }}/ml2_conf.ini upgrade head"
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - neutron-manage
+#
+#- name: "Running neutron in tmux"
+#  command: "{{ item }}"
+#  ignore_errors: true
+#  with_items:
+#    - tmux kill-session -t neutron
+#  tags:
+#    - neutron-run
+#  when: inventory_hostname in groups['controller']
+#
+#
+#- name: "Running neutron in tmux"
+#  command: "{{ item }}"
+#  with_items:
+#    - tmux new -d -s neutron -n neutron-ser
+#    - tmux send-keys -t neutron:0 "{{ venv }}/neutron-server --config-file {{ conf_path }}/neutron.conf --config-file {{ ml2_conf_path }}/ml2_conf.ini" C-m
+#    - tmux neww -t neutron:1 -n neutron-dhcp
+#    - tmux send-keys -t neutron:1 "{{ venv }}/neutron-dhcp-agent --config-file {{ conf_path }}/neutron.conf --config-file {{ dhcp_conf_path }}/dhcp_agent.ini" C-m
+#    - tmux neww -t neutron:2 -n neutron-meta
+#    - tmux send-keys -t neutron:2 "{{ venv }}/neutron-metadata-agent --config-file {{ conf_path }}/neutron.conf --config-file {{ meta_conf_path }}/metadata_agent.ini" C-m
+#    - tmux neww -t neutron:3 -n neutron-openvswitch
+#    - tmux send-keys -t neutron:3 "{{ venv }}/neutron-openvswitch-agent --config-file {{ conf_path }}/neutron.conf --config-file {{ ml2_conf_path }}/ml2_conf.ini" C-m
+#    #- tmux neww -t neutron:4 -n neutron-l3
+#    #- tmux send-keys -t neutron:4 "{{ venv }}/neutron-l3-agent --config-file {{ conf_path }}/neutron.conf --config-file {{ ml2_conf_path }}/ml2_conf.ini" C-m
+#  tags:
+#    - run-neutron
+#  when: inventory_hostname in groups['controller']
+#
+#- name: "Running neutron in tmux"
+#  command: "{{ item }}"
+#  ignore_errors: true
+#  with_items:
+#    - tmux kill-session -t neutron
+#  tags:
+#    - neutron-run
+#  when: inventory_hostname in groups['computer']
+#
+#
+#- name: "Running neutron-agent in tmux"
+#  command: "{{ item }}"
+#  with_items:
+#    - tmux new -d -s neutron -n neutron-openvswitch
+#    - tmux send-keys -t neutron:0 "{{ venv }}/neutron-openvswitch-agent --config-file {{ conf_path }}/neutron.conf --config-file {{ ml2_conf_path }}/ml2_conf.ini" C-m
+#  tags:
+#    - run-neutron-openvswitch-agent
+#  when: inventory_hostname in groups['computer']
+#- include: nova_venv_install.yml
+#  static: no
+#  when: nova_developer_mode | bool
+#  tags:
+#    - always
+#    - nova-developer-install
+#
+#- include: nova_config.yml
+#  static: no
+#  tags:
+#    - always
+#    - nova-config
+#
+#- include: nova_db_sync.yml
+#  static: no
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - always
+#    - nova-db-sync
+#
+#
+#- include: nova_keystone_data.yml
+#  static: no
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - always
+#    - nova-keystone_data
+#
+#- include: nova_start.yml
+#  static: no
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - always
+#    - nova-start
+#
+#

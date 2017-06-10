@@ -1,0 +1,9 @@
+---
+# vars file for roles/openstack/nova
+#
+
+
+#venv: /root/workspace/openstack/src/nova/.tox/py27/bin
+#conf_path: /root/workspace/openstack/src/nova/etc/nova
+nova_bin_path: "{{ nova_developer_mode | bool | ternary(nova_git_clone_dir ~ '/.tox/py27/bin/', '') }}"
+nova_conf: "{{ nova_developer_mode | bool | ternary(nova_git_clone_dir ~ '/etc/nova/nova.conf', '/etc/nova/nova.conf') }}"

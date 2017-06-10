@@ -1,0 +1,43 @@
+---
+# tasks file for roles/system/pip
+
+- name: Install pip
+  easy_install:
+    name: pip
+    state: latest
+        
+- name: create pip conf directory if it doesn't exist
+  file:
+    path: ~/.pip
+    state: directory
+    mode: 0755
+
+- name: Configure pip resource in ~/.pip/pip.conf
+  template:
+    src: pip.conf.j2
+    dest: ~/.pip/pip.conf
+
+- name: Install virtualenv
+  pip:
+    name: virtualenv
+
+- name: Install bindep
+  pip:
+    name: bindep
+  tags:
+    virtualenv
+
+- name: Install tox
+  pip:
+    name: tox
+  tags:
+    virtualenv
+
+- name: Install tox
+  pip:
+    name: "{{item}}"
+  with_items:
+    - cryptography
+    - uwsgi
+  tags:
+    - cry

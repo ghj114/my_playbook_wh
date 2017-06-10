@@ -1,0 +1,12 @@
+- name: Install horizon
+  hosts: 
+    - controller
+  gather_facts: "{{ gather_facts | default(True) }}"
+  max_fail_percentage: 0
+  remote_user: root
+  roles:
+    - role: openstack/horizon
+  vars_files:
+    - defaults/horizon_all.yml
+  tags:
+    - horizon

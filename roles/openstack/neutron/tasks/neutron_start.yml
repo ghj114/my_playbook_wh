@@ -1,0 +1,59 @@
+---
+
+- name: "Running neutron in tmux"
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+    - tmux kill-session -t neutron
+  tags:
+    - neutron-run
+  when: inventory_hostname in groups['controller']
+
+- name: "Running neutron in tmux"
+  command: "{{ item }}"
+  with_items:
+    - "{{ neutron_bin_path }}pip install python-memcached"
+    - mkdir -p {{ neutron_log }}
+    - tmux new -d -s neutron -n server
+    - tmux send-keys -t neutron:0 "{{ neutron_bin_path }}neutron-server --config-file {{ neutron_conf_path }}/neutron.conf 
+                                                                        --config-file {{ neutron_conf_path }}/plugins/ml2_conf.ini
+                                                                        --log-dir {{ neutron_log }}" C-m
+    - tmux neww -t neutron:1 -n dhcp
+    - tmux send-keys -t neutron:1 "{{ neutron_bin_path }}neutron-dhcp-agent --config-file {{ neutron_conf_path }}/neutron.conf 
+                                                                            --config-file {{ neutron_conf_path }}/dhcp_agent.ini 
+                                                                            --log-dir {{ neutron_log }}" C-m
+    - tmux neww -t neutron:2 -n meta
+    - tmux send-keys -t neutron:2 "{{ neutron_bin_path }}neutron-metadata-agent --config-file {{ neutron_conf_path }}/neutron.conf 
+                                                                                --config-file {{neutron_conf_path }}/metadata_agent.ini
+                                                                                --log-dir {{ neutron_log }}" C-m
+    #- tmux neww -t neutron:3 -n openvswitch
+    #- tmux send-keys -t neutron:3 "{{ neutron_bin_path }}neutron-openvswitch-agent --config-file {{ neutron_conf_path }}/neutron.conf --config-file {{ neutron_conf_path}}/plugins/ml2_conf.ini" C-m
+    #- tmux neww -t neutron:4 -n neutron-l3
+    #- tmux send-keys -t neutron:4 "{{ neutron_bin_path }}/neutron-l3-agent --config-file {{ conf_path }}/neutron.conf --config-file {{ ml2_conf_path }}/ml2_conf.ini" C-m
+  tags:
+    - neutron-run
+  when: inventory_hostname in groups['controller']
+
+- name: "Running neutron-compute in tmux"
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+    - tmux kill-session -t neutron
+  tags:
+    - neutron-run
+    - neutron-computer-run
+  when: inventory_hostname in groups['computer']
+
+- name: "Running neutron-agent tmux"
+  command: "{{ item }}"
+  with_items:
+    - "{{ neutron_bin_path }}pip install python-memcached"
+    - mkdir -p {{ neutron_log }}
+    - tmux new -d -s neutron -n openvswitch
+    - tmux send-keys -t neutron:0 "{{ neutron_bin_path ~ 'neutron-openvswitch-agent'}} --config-file {{ neutron_conf_path }}/neutron.conf 
+                                                                                       --config-file {{ neutron_conf_path}}/plugins/ml2_conf.ini
+                                                                                       --log-dir {{ neutron_log }}" C-m
+  tags:
+    - neutron-run
+    - neutron-agent-run
+  when: inventory_hostname in groups['computer']

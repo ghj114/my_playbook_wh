@@ -1,0 +1,13 @@
+- name: Install docker
+  hosts: 
+    - test
+  gather_facts: "{{ gather_facts | default(True) }}"
+  max_fail_percentage: 20
+  remote_user: root
+  roles:
+    - role: "docker"
+  vars:
+    ansible_distribution: "Ubuntu"
+    ansible_distribution_release: "xenial"
+  tags:
+    - docker

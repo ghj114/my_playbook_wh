@@ -1,0 +1,19 @@
+---
+
+- name: Git clone glance code
+  git:
+    repo: "{{ git_base_repo }}/glance.git"
+    dest: "{{ glance_git_clone_dir }}"
+    version: "{{ glance_version }}"
+    update: no
+  tags:
+    - glance-git
+    - glance-install
+
+- name: tox-py27
+  command: tox -e py27 --notest
+  args:
+    chdir: "{{ glance_git_clone_dir }}"
+  tags:
+    - glance-tox
+    - glance-install

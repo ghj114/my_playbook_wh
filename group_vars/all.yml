@@ -1,0 +1,22 @@
+---
+
+#openstack_release: ocata
+openstack_release: newton
+#openstack_release: mitaka
+
+mysql_root_user: root
+mysql_root_password: "stackdb"
+mysql_login_host: "{{ groups['mysql'][0] }}"
+
+developer_mode: false
+
+git_base_repo: https://git.openstack.org/openstack
+git_clone_dir: /opt/openstack/{{ openstack_release }}
+
+
+keystone_admin_env: "--os-username='admin' --os-password='admin' --os-project-name='admin' --os-user-domain-name='default' --os-project-domain-name='default' \
+                     --os-auth-url=http://{{ groups['controller'][0] }}:35357/v3 --os-identity-api-version='3'" 
+
+osclient_git_clone_dir: "{{ git_clone_dir ~ '/python-openstackclient' }}"
+openstack_bin: "{{ developer_mode | bool | ternary(osclient_git_clone_dir ~ '/.tox/py27/bin/openstack', 'openstack') }}"
+log_dir: "{{ git_clone_dir ~ '/data/log'}}"

@@ -1,0 +1,19 @@
+---
+
+- name: Git clone neutron code
+  git:
+    repo: "{{ git_base_repo }}/neutron.git"
+    dest: "{{ neutron_git_clone_dir }}"
+    version: "{{ neutron_version }}"
+    update: no
+  tags:
+    - neutron-git
+    - neutron-install
+
+- name: tox-py27
+  command: tox -e py27 --notest
+  args:
+    chdir: "{{ neutron_git_clone_dir }}"
+  tags:
+    - neutron-tox
+    - neutron-install

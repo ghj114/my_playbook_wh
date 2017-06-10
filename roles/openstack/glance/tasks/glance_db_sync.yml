@@ -1,0 +1,7 @@
+---
+
+- name: glance database sync
+  command: "{{ item }}"
+  with_items:
+    - "{{ glance_bin_path ~ 'glance-manage' }} --config-file {{ glance_conf_path }}/glance-api.conf db_sync"
+

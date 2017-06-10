@@ -1,0 +1,23 @@
+---
+
+
+- name: "Running ansible in tmux"
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+    - tmux kill-session -t ansible
+  tags:
+    - ansible-run
+
+- name: "Running ansible in tmux"
+  command: "{{ item }}"
+  with_items:
+    - tmux new -d -s ansible -n cmd
+    - tmux send-keys -t ansible:0 "source {{ ansible_dir}}/hacking/env-setup" C-m
+    #- tmux neww -t nova:4 -n novncproxy
+    #- tmux send-keys -t nova:4 "{{ nova_bin_path ~ 'nova-novncproxy'}} --config-file {{ nova_conf }} --web {{git_clone_dir}}/noVNC" C-m
+    #- tmux neww -t nova:5 -n placement
+    #- tmux send-keys -t nova:5 "{{ nova_bin_path ~ 'nova-placement-api'}} --config-file {{ nova_conf }}" C-m
+  tags:
+    - ansible-run
+

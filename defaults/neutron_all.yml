@@ -1,0 +1,18 @@
+---
+
+neutron_mysql_user: neutron
+neutron_mysql_password: neutron
+neutron_mysql_database: neutron
+
+neutron_developer_mode: "{{ developer_mode }}"
+
+neutron_git_clone_dir: "{{ git_clone_dir }}/neutron"
+neutron_version: stable/{{ openstack_release }}
+neutron_log: "{{ log_dir ~ '/neutron'}}"
+
+#neutron_conf_template: "neutron_tn.conf.j2"
+#ml2_conf_template: "ml2_tn_conf.ini.j2"
+neutron_conf_template: "neutron_tn_pro.conf.j2"
+ml2_conf_template: "ml2_tnpro_conf.ini.j2"
+
+

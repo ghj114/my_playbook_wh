@@ -1,0 +1,29 @@
+---
+# tasks file for roles/ntp
+- name: Yum install NTP
+  yum:
+    name: "ntp"
+    state: present
+  tags:
+    - ntp-install
+
+- name: "Ntpdate "
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+    #- ntpdate {{ groups['controller'][0] }}
+    - ntpdate {{ ntp_server }}
+  when: inventory_hostname in groups['computer']
+  tags:
+    - ntpdate
+
+- name: "Crontab config"
+  lineinfile:
+    path: /var/spool/cron/root
+    create: yes
+    #line: "*/5 * * * * /usr/sbin/ntpdate {{ groups['controller'][0] }}"
+    line: "*/5 * * * * /usr/sbin/ntpdate {{ ntp_server }}"
+  when: inventory_hostname in groups['computer']
+  tags:
+    - ntpdate-crontab
+

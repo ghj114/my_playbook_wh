@@ -1,0 +1,27 @@
+---
+
+- name: Generate libvirt and qemu config
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "root"
+    group: "root"
+    mode: "0640"
+    backup: "yes"
+  with_items:
+    - src: "qemu.conf.j2"
+      dest: "/etc/libvirt/qemu.conf"
+    - src: "libvirtd.conf.j2"
+      dest: "/etc/libvirt/libvirtd.conf"
+    #- src: "{{ libvirtd.j2}}"
+    #  dest: "/etc/sysconfig/libvirtd"
+  #notify: Restart nova compute
+  tags:
+    - libvirtd-config
+
+- name: Start libvirtd.service
+  systemd:
+    name: libvirtd.service
+    state: started
+    enabled: True
+

@@ -1,0 +1,19 @@
+---
+
+- name: Git clone keystone code
+  git:
+    repo: "{{ git_base_repo }}/keystone.git"
+    dest: "{{ keystone_git_clone_dir }}"
+    version: "{{ keystone_version }}"
+    update: no
+  tags:
+    - keystone-git
+    - keystone-install
+
+- name: tox-py27
+  command: tox -e py27 --notest
+  args:
+    chdir: "{{ keystone_git_clone_dir }}"
+  tags:
+    - keystone-tox
+    - keystone-install

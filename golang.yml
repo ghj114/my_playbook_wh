@@ -1,0 +1,13 @@
+- name: Install golang
+  hosts: 
+    - test
+  gather_facts: "{{ gather_facts | default(True) }}"
+  max_fail_percentage: 20
+  remote_user: root
+  roles:
+    - role: "golang"
+  vars:
+   golang_dir: /usr/local/
+   golang_version: 1.8.1
+  tags:
+    - golang

@@ -1,0 +1,39 @@
+---
+# tasks file for roles/openstack/openstackclient
+
+- name: Git clone python-openstackclient code
+  git:
+    repo: "{{ git_base_repo }}/python-openstackclient.git"
+    dest: "{{ openstackclient_git_clone_dir }}"
+    version: "{{ openstackclient_version }}"
+    update: no
+  tags:
+    - openstackclient-git
+    - openstackclient-install
+
+- name: tox-py27
+  command: tox -e py27 --notest
+  args:
+    chdir: "{{ openstackclient_git_clone_dir }}"
+  tags:
+    - openstackclient-tox
+    - openstackclient-install
+
+- name: "Running openstackclient in tmux"
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+    - tmux kill-session -t openstackclient
+  tags:
+    - openstackclient-run
+  when: inventory_hostname in groups['controller']
+
+- name: "Running openstackclient in tmux"
+  command: "{{ item }}"
+  with_items:
+    - tmux new -d -s openstackclient -n openstackclient
+    - tmux send-keys -t openstackclient:0 "source {{ openstackclient_bin_path }}activate" C-m
+  tags:
+    - openstackclient-run
+  when: inventory_hostname in groups['controller']
+

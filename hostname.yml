@@ -1,0 +1,13 @@
+- name: Set hostname for Centos7
+  hosts: 
+    - computer
+  gather_facts: "{{ gather_facts | default(True) }}"
+  max_fail_percentage: 0
+  remote_user: root
+  roles:
+    - role: hostname
+  vars:
+    hostname_prefix: "TN-{{ ('controller' in group_names ) | ternary('controller', 'computer') }}"
+    hostname_var: "{{ hostname_prefix ~ '-' ~ ansible_default_ipv4['address'].replace('.', '-') }}"
+  tags:
+    - hostname

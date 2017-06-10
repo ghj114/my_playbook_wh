@@ -1,0 +1,17 @@
+set -g mouse on
+set-option -g allow-rename off 
+setw -g mode-keys vi
+set -g status-bg colour235
+set -g status-fg colour248
+
+set -g status-left-length 20
+set -g status-left "#[default]» #[fg=colour187]#S #[default]» #[fg=colour187]#[default]"
+set -g status-right-length 100 
+set -g status-right "#[default]#(hostname -i)  #(date -d now)"
+
+
+
+setw -g window-status-current-fg colour223
+setw -g window-status-current-bg colour237
+
+setw -g window-status-current-attr bold

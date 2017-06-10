@@ -1,0 +1,5 @@
+---
+# vars file for roles/openstack/keystone
+
+keystone_bin_path: "{{ keystone_developer_mode | bool | ternary(keystone_git_clone_dir ~ '/.tox/py27/bin/', '') }}"
+keystone_conf_path: "{{ keystone_developer_mode | bool | ternary(keystone_git_clone_dir ~ '/etc', '/etc/keystone') }}"

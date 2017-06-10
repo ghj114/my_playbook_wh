@@ -1,0 +1,28 @@
+---
+# tasks file for roles/vim
+#
+- name: Git clone k-vim code
+  git:
+    repo: https://github.com/wklken/k-vim.git
+    dest: "{{ kvim_dir }}"
+    version: "master"
+    update: no
+  tags:
+    - kvim-clone
+
+- name: "Install k-vim"
+  shell: "{{ item }}"
+  args:
+    chdir: "{{ kvim_dir }}"
+  with_items:
+    - sh -x install.sh > kvim.log 2>&1
+  tags:
+    - kvim-install
+
+#- include: kvim-config.yml
+#  static: no
+#  tags:
+#   - kvim-config
+
+
+

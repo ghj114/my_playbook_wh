@@ -1,0 +1,19 @@
+---
+
+- name: Generate nova config
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "root"
+    group: "{{ nova_developer_mode | bool | ternary('root', 'nova') }}"
+    mode: "0640"
+    backup: "yes"
+  with_items:
+    - src: "{{ nova_conf_template }}"
+      dest: "{{ nova_developer_mode | bool | ternary(nova_git_clone_dir ~ '/etc/nova/nova.conf', '/etc/nova/nova.conf') }}"
+  #notify: Restart nova compute
+  tags:
+    - nova-config
+    - nova-post-install
+
+

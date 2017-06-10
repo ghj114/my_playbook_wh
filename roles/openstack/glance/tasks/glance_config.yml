@@ -1,0 +1,20 @@
+---
+
+- name: Generate glance config
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "root"
+    group: "{{ glance_developer_mode | bool | ternary('root', 'nova') }}"
+    mode: "0640"
+    backup: "yes"
+  with_items:
+    - src: "glance-api.conf.j2"
+      dest: "{{ glance_conf_path ~ '/glance-api.conf'}}"
+    - src: "glance-registry.conf.j2"
+      dest: "{{ glance_conf_path ~ '/glance-registry.conf'}}"
+  #notify: Restart nova compute
+  tags:
+    - glance-config
+    - glance-post-install
+

@@ -1,0 +1,164 @@
+---
+# tasks file for roles/openstack/glance
+
+- include: glance_venv_install.yml
+  static: no
+  when: glance_developer_mode | bool
+  tags:
+    - glance-developer-install
+
+- include: glance_config.yml
+  static: no
+  tags:
+    - glance-config
+
+- include: glance_db_sync.yml
+  static: no
+  when: inventory_hostname in groups['controller']
+  tags:
+    - glance-db-sync
+
+
+- include: glance_keystone_data.yml
+  static: no
+  when: inventory_hostname in groups['controller']
+  tags:
+    - glance-keystone-data
+
+- include: glance_start.yml
+  static: no
+  when: inventory_hostname in groups['controller']
+  tags:
+    - glance-start
+
+
+
+#- name: Create a new database with name 'glance'
+#  mysql_db:
+#    name: glance
+#    login_password: xxxx.123
+#    state: present
+#
+#- name: Grant access to the DB glance for the service
+#  mysql_user:
+#    login_user: root
+#    login_password: xxxx.123
+#    name: glance
+#    password: glance
+#    host: "{{ item }}"
+#    state: "present"
+#    priv: "glance.*:ALL"
+#  with_items:
+#    - localhost
+#    - "%"
+#  tags:
+#    - glance-mysql
+#
+#- name: glance pip Install 
+#  pip:
+#    name: "{{item}}"
+#  with_items:
+#    - tox
+#  tags:
+#    - glance-pip
+#
+#- name: Create the glance data
+#  command: "{{ item }}"
+#  with_items:
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} user create --domain default --password glance glance"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} role add --project service --user glance admin"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} service create --name glance --description 'OpenStack Image' image"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} endpoint create --region RegionOne image public http://{{groups['controller'][0]}}:9292"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} endpoint create --region RegionOne image internal http://{{groups['controller'][0]}}:9292"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} endpoint create --region RegionOne image admin http://{{groups['controller'][0]}}:9292"
+#  tags:
+#    - glance-create
+#
+#- name: Git clone glance code
+#  git:
+#    repo: https://git.openstack.org/openstack/glance.git
+#    dest: /root/workspace/openstack/src/glance
+#    version: stable/ocata
+#    update: no
+#  tags:
+#    - git-glance
+#
+#- name: tox
+#  command: tox -e py27 --notest
+#  args:
+#    chdir: /root/workspace/openstack/src/glance
+#  tags:
+#    - tox
+#
+##- name: Copy glance conf file
+##  command: cp glance.conf.sample keystone.conf
+##  args:
+##    chdir: /root/workspace/openstack/src/keystone/etc
+##  tags:
+##    - tox
+##
+#- name: Glance-api conf file
+#  ini_file:
+#    path: /root/workspace/openstack/src/glance/etc/glance-api.conf
+#    section: "{{ item.section }}"
+#    option: "{{ item.option }}"
+#    value: "{{ item.value }}"
+#  with_items:
+#    - { section: "database", option: "connection", value: "mysql+pymysql://glance:glance@{{ groups['controller'][0] }}/glance" } 
+#    - { section: "keystone_authtoken", option: "auth_uri", value: "http://{{ groups['controller'][0] }}:5000" }
+#    - { section: "keystone_authtoken", option: "auth_url", value: "http://{{ groups['controller'][0] }}:35357" }
+#    - { section: "keystone_authtoken", option: "memcached_servers", value: "{{ groups['controller'][0] }}:11211" }
+#    - { section: "keystone_authtoken", option: "auth_type", value: "password" }
+#    - { section: "keystone_authtoken", option: "project_domain_name", value: "default" }
+#    - { section: "keystone_authtoken", option: "user_domain_name", value: "default" }
+#    - { section: "keystone_authtoken", option: "project_name" , value: "service" }
+#    - { section: "keystone_authtoken", option: "username", value: "glance" }
+#    - { section: "keystone_authtoken", option: "password", value: "glance" }
+#    - { section: "paste_deploy", option: "flavor", value: "keystone" }
+#    - { section: "glance_store", option: "stores", value: "file,http" }
+#    - { section: "glance_store", option: "default_store", value: "file" }
+#    - { section: "glance_store", option: "filesystem_store_datadir", value: "/var/lib/glance/images/" }
+#  tags:
+#    - conf
+#
+#- name: Glance-registry conf file
+#  ini_file:
+#    path: /root/workspace/openstack/src/glance/etc/glance-registry.conf
+#    section: "{{ item.section }}"
+#    option: "{{ item.option }}"
+#    value: "{{ item.value }}"
+#  with_items:
+#    - { section: "database", option: "connection", value: "mysql+pymysql://glance:glance@{{ groups['controller'][0] }}/glance" } 
+#    - { section: "keystone_authtoken", option: "auth_uri", value: "http://{{ groups['controller'][0] }}:5000" }
+#    - { section: "keystone_authtoken", option: "auth_url", value: "http://{{ groups['controller'][0] }}:35357" }
+#    - { section: "keystone_authtoken", option: "memcached_servers", value: "{{ groups['controller'][0] }}:11211" }
+#    - { section: "keystone_authtoken", option: "auth_type", value: "password" }
+#    - { section: "keystone_authtoken", option: "project_domain_name", value: "default" }
+#    - { section: "keystone_authtoken", option: "user_domain_name", value: "default" }
+#    - { section: "keystone_authtoken", option: "project_name" , value: "service" }
+#    - { section: "keystone_authtoken", option: "username", value: "glance" }
+#    - { section: "keystone_authtoken", option: "password", value: "glance" }
+#    - { section: "paste_deploy", option: "flavor", value: "keystone" }
+#  tags:
+#    - conf
+#
+#
+#- name: Glance database sync
+#  command: "{{ item }}"
+#  with_items:
+#    - "{{ venv }}/glance-manage --config-file {{ conf_path }}/glance-api.conf db_sync"
+#  tags:
+#    - glance-manage
+#
+#- name: "Running glance in tmux"
+#  command: "{{ item }}"
+#  with_items:
+#    - tmux new -d -s glance -n glance-api
+#    - tmux neww -a -t glance -n glance-registry
+#    - tmux send-keys -t glance:0 "{{ venv }}/glance-api --config-file {{ conf_path }}/glance-api.conf" C-m
+#    - tmux send-keys -t glance:1 "{{ venv }}/glance-registry --config-file {{ conf_path }}/glance-registry.conf" C-m
+#  tags:
+#    - run-glance
+
+#- tmux new -d -s glance -n glance-api '/bin/sh -c "{{ venv }}/glance-api --config-file {{ conf_path }}/glance-api.conf;exec bash"'
+#- tmux neww -a -t glance -n glance-registry '/bin/sh -c "{{ venv }}/glance-registry --config-file {{ conf_path }}/glance-registry.conf;exec bash"'

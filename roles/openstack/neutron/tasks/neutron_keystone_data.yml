@@ -1,0 +1,18 @@
+---
+
+- name: Delete the neutron data
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+      - "{{ openstack_bin }} {{keystone_admin_env}} user delete neutron"
+      - "{{ openstack_bin }} {{keystone_admin_env}} service delete neutron"
+
+- name: Create the neutron data
+  command: "{{ item }}"
+  with_items:
+      - "{{ openstack_bin }} {{keystone_admin_env}} user create --domain default --password neutron neutron"
+      - "{{ openstack_bin }} {{keystone_admin_env}} role add --project service --user neutron admin"
+      - "{{ openstack_bin }} {{keystone_admin_env}} service create --name neutron --description 'OpenStack Networking' network"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne network public http://{{groups['controller'][0]}}:9696"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne network internal http://{{groups['controller'][0]}}:9696"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne network admin http://{{groups['controller'][0]}}:9696"

@@ -1,0 +1,43 @@
+---
+# tasks file for roles/docker
+- name: Yum install yum-utils
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - yum-utils
+  tags:
+    - install-yum-utils
+
+#- name: Add docker-ce repo
+#  yum_repository:
+#    name: docker-ce
+#    description: Docker CE
+#    baseurl: 'https://download.docker.com/linux/centos/docker-ce.repo'
+
+- name: Add docker-ce repo
+  command: "{{ item }}"
+  with_items:
+      - yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+      - yum-config-manager --disable docker-ce-edge
+      - yum makecache fast
+  tags:
+    - yum-add-repo
+
+- name: Install docker
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - docker-ce
+  tags:
+    - install-epel
+
+- name: Start docker
+  systemd:
+    name: docker
+    state: started
+    enabled: True
+  tags:
+    - docker-start
+

@@ -1,0 +1,40 @@
+---
+# tasks file for roles/mysql
+#- name: Install OpenStack repository
+#  yum:
+#    name: centos-release-openstack-ocata
+#    state: present
+#
+#- name: upgrade all packages
+#  yum:
+#    name: '*'
+#    state: latest
+
+- name: Install mysql
+  yum:
+    name: "{{item}}"
+    state: present
+  with_items:
+    - mariadb
+    - mariadb-server
+    - python2-PyMySQL
+    - MySQL-python
+
+- name: Configure my.conf
+  template:
+    src: openstack.cnf.j2
+    dest: /etc/my.cnf.d/openstack.cnf
+
+
+- name: Start mysql
+  systemd:
+    name: mariadb
+    state: started
+    enabled: true
+
+  #- name: Set root Password
+  #  mysql_user: name=root host="{{item}}" password=stackdb.123 state=present
+  #  with_items:
+  #    - localhost
+  #    - 127.0.0.1
+  #    - ::1

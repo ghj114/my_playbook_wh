@@ -1,0 +1,81 @@
+---
+# tasks file for roles/openstack/horizon
+- name: Git clone horizon code
+  git:
+    repo: "{{ git_base_repo }}/horizon.git"
+    dest: "{{ horizon_git_clone_dir }}"
+    version: "{{ horizon_version }}"
+    update: no
+  tags:
+    - horizon-git
+    - horizon-install
+
+- name: tox-py27
+  command: tox -e runserver --notest
+  args:
+    chdir: "{{ horizon_git_clone_dir }}"
+  tags:
+    - horizon-tox
+    - horizon-install
+
+- name: Copy horizon conf file
+  command: "{{ item }}"
+  args:
+    chdir: "{{ horizon_git_clone_dir }}/openstack_dashboard/local"
+  with_items:
+    - cp local_settings.py.example local_settings.py
+  tags:
+    - horizon-conf
+
+- name: setup horizon conf
+  lineinfile:
+    path: "{{ horizon_git_clone_dir }}/openstack_dashboard/local/local_settings.py"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+      - {regexp: '^OPENSTACK_HOST', line: "OPENSTACK_HOST = '{{ groups['controller'][0] }}'"} 
+      - {regexp: '^#ALLOWED_HOSTS', line: "ALLOWED_HOSTS = ['*']"}
+      - {regexp: '^OPENSTACK_KEYSTONE_URL', line: 'OPENSTACK_KEYSTONE_URL = "http://%s:5000/v3" % OPENSTACK_HOST'}
+
+- name: setup horizon conf
+  blockinfile:
+    path: "{{ horizon_git_clone_dir }}/openstack_dashboard/local/local_settings.py"
+    insertbefore: "#OPENSTACK_API_VERSIONS"
+    block: |
+        OPENSTACK_API_VERSIONS = {
+           "identity": 3,
+           "image": 2,
+           "volume": 2,
+           }
+
+#- name: setup horizon conf
+#  blockinfile:
+#    path: "{{ horizon_git_clone_dir }}/openstack_dashboard/local/local_settings.py"
+#    block: |
+#      CACHES = {
+#          'default': {
+#          'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#          'LOCATION': "groups['controller'][0]:11211",
+#          }
+#    }
+
+
+- name: "Running horizon in tmux"
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+    - tmux kill-session -t horizon
+  tags:
+    - horizon-run
+  when: inventory_hostname in groups['controller']
+
+- name: "Running horizon in tmux"
+  command: "{{ item }}"
+  with_items:
+    - "{{ horizon_bin_path }}pip install python-memcached"
+    - tmux new -d -s horizon -n horizon
+    - tmux send-keys -t horizon:0 "cd {{ horizon_git_clone_dir }}; tox -e runserver 0.0.0.0:9002" C-m
+  tags:
+    - horizon-run
+  when: inventory_hostname in groups['controller']
+

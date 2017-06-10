@@ -1,0 +1,56 @@
+---
+
+
+- name: "Running nova in tmux"
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+    - tmux kill-session -t nova
+  tags:
+    - nova-run
+  when: inventory_hostname in groups['controller']
+
+- name: "Running nova in tmux"
+  command: "{{ item }}"
+  with_items:
+    - "{{ nova_bin_path }}pip install python-memcached"
+    - mkdir -p {{ nova_log }}
+    - tmux new -d -s nova -n api
+    - tmux send-keys -t nova:0 "{{ nova_bin_path ~ 'nova-api'}} --config-file {{ nova_conf }} --log-dir {{ nova_log }}" C-m
+    - tmux neww -t nova:1 -n scheduler
+    - tmux send-keys -t nova:1 "{{ nova_bin_path ~ 'nova-scheduler'}} --config-file {{ nova_conf }} --log-dir {{ nova_log }}" C-m
+    - tmux neww -t nova:2 -n conductor
+    - tmux send-keys -t nova:2 "{{ nova_bin_path ~ 'nova-conductor'}} --config-file {{ nova_conf }} --log-dir {{ nova_log }}" C-m
+    - tmux neww -t nova:3 -n consoleauth
+    - tmux send-keys -t nova:3 "{{ nova_bin_path ~ 'nova-consoleauth'}} --config-file {{ nova_conf }} --log-dir {{ nova_log }}" C-m
+    - tmux neww -t nova:4 -n novncproxy
+    - tmux send-keys -t nova:4 "{{ nova_bin_path ~ 'nova-novncproxy'}} --config-file {{ nova_conf }} --web {{git_clone_dir}}/noVNC" C-m
+    #- tmux neww -t nova:5 -n placement
+    #- tmux send-keys -t nova:5 "{{ nova_bin_path ~ 'nova-placement-api'}} --config-file {{ nova_conf }}" C-m
+  tags:
+    - nova-run
+  when: inventory_hostname in groups['controller']
+
+- name: "Running nova-compute in tmux"
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+    - tmux kill-session -t nova
+  tags:
+    - nova-run
+    - nova-computer-run
+  when: inventory_hostname in groups['computer']
+
+- name: "Running nova-compute in tmux"
+  command: "{{ item }}"
+  with_items:
+    - "{{ nova_bin_path }}pip install python-memcached"
+    - "{{ nova_bin_path }}pip install libvirt-python==2.0.0"
+    - mkdir -p {{ nova_log }}
+    - tmux new -d -s nova -n nova-compute
+    - tmux send-keys -t nova:0 "{{ nova_bin_path ~ 'nova-compute'}} --config-file {{ nova_conf }} --log-dir {{ nova_log }}" C-m
+  tags:
+    - nova-run
+    - nova-computer-run
+  when: inventory_hostname in groups['computer']
+

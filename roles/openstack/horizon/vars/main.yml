@@ -1,0 +1,3 @@
+---
+# vars file for roles/openstack/horizon
+horizon_bin_path: "{{ horizon_developer_mode | bool | ternary(horizon_git_clone_dir ~ '/.tox/runserver/bin/', '') }}"

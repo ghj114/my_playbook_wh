@@ -1,0 +1,13 @@
+- name: Install ceph client
+  hosts: 
+    - computer
+  gather_facts: "{{ gather_facts | default(True) }}"
+  max_fail_percentage: 0
+  remote_user: root
+  pre_tasks:
+    - include: common-tasks/openstack-repo-install.yml
+      static: no
+  roles:
+    - role: openstack/ceph
+  tags:
+    - ceph

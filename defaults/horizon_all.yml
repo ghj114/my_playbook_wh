@@ -1,0 +1,8 @@
+---
+
+horizon_developer_mode: "{{ developer_mode }}"
+
+horizon_git_clone_dir: "{{ git_clone_dir }}/horizon"
+horizon_version: stable/{{ openstack_release }}
+
+

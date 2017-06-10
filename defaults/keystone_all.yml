@@ -1,0 +1,12 @@
+---
+
+keystone_mysql_user: keystone
+keystone_mysql_password: keystone
+keystone_mysql_database: keystone
+
+keystone_developer_mode: "{{ developer_mode }}"
+
+keystone_git_clone_dir: "{{ git_clone_dir }}/keystone"
+keystone_version: stable/{{ openstack_release }} 
+
+

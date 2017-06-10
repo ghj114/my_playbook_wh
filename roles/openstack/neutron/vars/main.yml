@@ -1,0 +1,12 @@
+---
+# vars file for roles/openstack/neutron
+#osclient_venv: /root/workspace/openstack/src/python-openstackclient/.tox/py27/bin
+#keystone_admin_env: "--os-username='admin' --os-password='admin' --os-project-name='admin' --os-user-domain-name='default' --os-project-domain-name='default' \
+#                     --os-auth-url=http://{{ groups['controller'][0] }}:35357/v3 --os-identity-api-version='3'" 
+#venv: /root/workspace/openstack/src/neutron/.tox/py27/bin
+#conf_path: /root/workspace/openstack/src/neutron/etc/neutron
+#ml2_conf_path: /root/workspace/openstack/src/neutron/etc/neutron/plugins/ml2
+
+neutron_bin_path: "{{ neutron_developer_mode | bool | ternary(neutron_git_clone_dir ~ '/.tox/py27/bin/', '') }}"
+neutron_conf: "{{ neutron_developer_mode | bool | ternary(neutron_git_clone_dir ~ '/etc/neutron/neutron.conf', '/etc/neutron/neutron.conf') }}"
+neutron_conf_path: "{{ neutron_developer_mode | bool | ternary(neutron_git_clone_dir ~ '/etc/neutron', '/etc/neutron') }}"

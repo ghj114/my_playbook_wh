@@ -1,0 +1,20 @@
+- name: Install glance
+  hosts: 
+    - controller
+  gather_facts: "{{ gather_facts | default(True) }}"
+  max_fail_percentage: 0
+  remote_user: root
+  pre_tasks:
+    - include: common-tasks/mysql-db-user.yml 
+      static: no
+      vars:
+        user_name: "{{ glance_mysql_user }}"
+        password: "{{ glance_mysql_password }}"
+        db_name: "{{ glance_mysql_database }}"
+      when: inventory_hostname == groups['mysql'][0] 
+  roles:
+    - role: openstack/glance
+  vars_files:
+    - defaults/glance_all.yml
+  tags:
+    - glance

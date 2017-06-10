@@ -1,0 +1,46 @@
+---
+
+- name: Config iptables 
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+    backup: "yes"
+  with_items:
+    - src: "iptables.j2"
+      dest: "/etc/sysconfig/iptables"
+  tags:
+    - iptables-config
+
+- name: Start iptables and openvswithc
+  systemd:
+    name: "{{ item }}"
+    state: restarted
+    enabled: True
+  when: inventory_hostname in groups['computer']
+  with_items:
+    - iptables
+    - openvswitch.service
+
+- name: "Create ovs bridge"
+  command: "{{ item }}"
+  with_items:
+    - ovs-vsctl --if-exists del-br br-provider
+    - ovs-vsctl add-br br-provider
+    #- ovs-vsctl add-port br-provider em4
+    - ovs-vsctl add-bond br-provider bond0 em2 em3
+  tags:
+    - ovs-create-bridge
+  when: inventory_hostname in groups['computer']
+
+- name: Start openvswithc
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: True
+  when: inventory_hostname in groups['computer']
+  with_items:
+    - neutron-openvswitch-agent.service
+

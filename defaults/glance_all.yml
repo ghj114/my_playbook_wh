@@ -1,0 +1,12 @@
+---
+
+glance_mysql_user: glance
+glance_mysql_password: glance
+glance_mysql_database: glance
+
+glance_developer_mode: "{{ developer_mode }}"
+
+glance_git_clone_dir: "{{ git_clone_dir }}/glance"
+glance_version: stable/{{ openstack_release }}
+
+

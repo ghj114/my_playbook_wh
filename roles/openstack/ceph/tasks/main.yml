@@ -1,0 +1,46 @@
+---
+# tasks file for roles/openstack/ceph
+# 
+- name: Yum install ceph python-rbd
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - ceph
+    - python-rbd
+  when: inventory_hostname in groups['computer']
+  tags:
+    - ceph-client-installed
+
+- name: Copy yceph secret files to client
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "root"
+    group: "root"
+    mode: "0644"
+    backup: "yes"
+  with_items:
+    - src: "secret.xml.j2"
+      dest: "/etc/ceph/secret.xml"
+    - src: "ceph.client.admin.keyring.j2"
+      dest: "/etc/ceph/ceph.client.admin.keyring"
+    - src: "client.admin.key.j2"
+      dest: "/etc/ceph/client.admin.key"
+  tags:
+    - ceph-config
+    - ceph-post-install
+
+- name: "Virsh secret define"
+  shell: "{{ item }}"
+  args:
+    chdir: "/etc/ceph"
+  with_items:
+    - virsh secret-define --file secret.xml
+    - virsh secret-set-value --secret 41ee13fe-69ed-45d0-8f4b-e3c03f1a4ad5 --base64 $(cat client.admin.key)
+  tags:
+    - ceph-secret
+  when: inventory_hostname in groups['computer']
+
+
+

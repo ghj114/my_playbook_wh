@@ -1,0 +1,22 @@
+- name: Install neutron
+  hosts: 
+    #- controller
+    - computer
+  gather_facts: "{{ gather_facts | default(True) }}"
+  max_fail_percentage: 0
+  remote_user: root
+  pre_tasks:
+    - include: common-tasks/mysql-db-user.yml 
+      static: no
+      vars:
+        user_name: "{{ neutron_mysql_user }}"
+        password: "{{ neutron_mysql_password }}"
+        db_name: "{{ neutron_mysql_database }}"
+      when: "'mysql' in group_names" 
+  roles:
+    #- role: system/yum
+    - role: openstack/neutron
+  vars_files:
+    - defaults/neutron_all.yml
+  tags:
+    - neutron

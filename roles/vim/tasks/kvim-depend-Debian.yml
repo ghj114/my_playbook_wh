@@ -1,0 +1,26 @@
+---
+# tasks file for roles/vim
+#
+#- name: 'Install python2'
+#  raw: apt install -y python-simplejson
+
+- name: "Install python2"
+  apt:
+    name: "python-simplejson"
+    state: present
+  tags:
+    - kvim-ubuntu-depend
+
+- name: "Install depend"
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - git
+    - ctags
+    - build-essential
+    - cmake
+    - python-dev
+    - silversearcher-ag
+  tags:
+    - kvim-ubuntu-depend

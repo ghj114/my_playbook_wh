@@ -1,0 +1,7 @@
+---
+# vars file for roles/openstack/glance
+#
+
+glance_bin_path: "{{ glance_developer_mode | bool | ternary(glance_git_clone_dir ~ '/.tox/py27/bin/', '') }}"
+glance_conf_path: "{{ glance_developer_mode | bool | ternary(glance_git_clone_dir ~ '/etc', '/etc/glance') }}"
+

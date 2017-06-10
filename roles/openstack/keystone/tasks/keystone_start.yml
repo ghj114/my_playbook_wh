@@ -1,0 +1,22 @@
+---
+
+- name: "Running keystone in tmux"
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+    - tmux kill-session -t keystone
+  tags:
+    - keystone-run
+  when: inventory_hostname in groups['controller']
+
+- name: "Running keystone in tmux"
+  command: "{{ item }}"
+  with_items:
+    - "{{ keystone_bin_path }}pip install uwsgi"
+    - tmux new -d -s keystone -n keystone-admin
+    - tmux send-keys -t keystone:0 "{{ keystone_bin_path }}uwsgi --http :35357 --wsgi-file {{ keystone_bin_path }}keystone-wsgi-admin" C-m
+    - tmux neww -t keystone:1 -n keystone-public
+    - tmux send-keys -t keystone:1 "{{ keystone_bin_path }}uwsgi --http :5000 --wsgi-file {{ keystone_bin_path }}keystone-wsgi-public" C-m
+  tags:
+    - keystone-run
+  when: inventory_hostname in groups['controller']

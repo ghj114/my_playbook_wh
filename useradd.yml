@@ -1,0 +1,50 @@
+- name: Useradd
+  hosts: 
+    - useradd
+  gather_facts: "{{ gather_facts | default(True) }}"
+  max_fail_percentage: 20
+  #remote_user: root
+  remote_user: xxxx
+  become: yes
+  tasks:
+    - name: Add group
+      group:
+        name: "{{ gp_name }}"
+        state: present
+    - name: Add sudo
+      lineinfile:
+        path: "/etc/sudoers.d/91-{{ gp_name }}-users"
+        #path: /etc/sudoers.d/90-db-users
+        state: present
+        create: yes
+        line: "%{{ gp_name }} ALL=(ALL) NOPASSWD: ALL"
+        owner: root
+        group: root
+        mode: 0440
+    - name: Add some users
+      user:
+        name: "{{item.name}}"
+        group: "{{ gp_name }}"
+        shell: /bin/bash
+        expires: 0
+        #password: "{{ lookup('passwordstore', 'passwd.txt create=true') }}"
+        #password: "{{ lookup('passwordstore', 'passwd.txt create=true') | password_hash('sha512') }}"
+        password: "{{ lookup('password', 'userpassword/{{ item.name }}.txt length=8') | password_hash('sha512') }}"
+        #password: "{{ '123456' | password_hash('sha512') }}"
+        #password: "{{ lookup('password', 'passwd.txt length=8 encrypt=sha512_crypt') }}"
+        #password: "{{item.password}}"
+      with_items: "{{ sudoers }}"
+    #- name: Expire
+    #  command: chage -d 0 {{ item.name }}
+    #  with_items: "{{ sudoers }}"
+      #when: "{{ item.changed == true }}"
+  vars:
+    #gp_name: develop
+    #gp_name: dba
+    gp_name: app
+    sudoers:
+      - name: xxxx
+      #- name: zhangjin
+      #  password: "{{ 'xLb17YcV' | password_hash('sha512') }}"
+  tags:
+    - useradd

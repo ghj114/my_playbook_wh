@@ -1,0 +1,277 @@
+---
+
+- include: hypervisor_install.yml
+  static: no
+  when: inventory_hostname in groups['computer']
+  tags:
+    - hypervisor-install
+
+- include: hypervisor_config.yml
+  static: no
+  when: inventory_hostname in groups['computer']
+  tags:
+    - hypervisor-config
+
+
+- include: nova_venv_install.yml
+  static: no
+  when: nova_developer_mode | bool
+  tags:
+    - nova-developer-install
+
+- include: nova_yum_install.yml
+  static: no
+  when: nova_developer_mode | bool == false
+  tags:
+    - nova-yum-install
+
+
+- include: nova_config.yml
+  static: no
+  tags:
+    - nova-config
+
+- include: nova_db_sync.yml
+  static: no
+  when: inventory_hostname in groups['controller']
+  tags:
+    - nova-db-sync
+
+
+- include: nova_keystone_data.yml
+  static: no
+  when: inventory_hostname in groups['controller']
+  tags:
+    - nova-keystone_data
+
+- include: nova_ssh_copy_key.yml
+  static: no
+  when: inventory_hostname in groups['computer']
+  tags:
+    - nova-key
+
+
+- include: nova_start.yml
+  static: no
+  when: nova_developer_mode | bool
+  tags:
+    - nova-start
+
+- include: nova_yum_start.yml
+  static: no
+  when: nova_developer_mode | bool == false
+  tags:
+    - nova-start
+
+
+
+# tasks file for roles/openstack/nova
+#- name: Delete databases
+#  mysql_db:
+#    name: "{{ item }}"
+#    login_password: xxxx.123
+#    state: absent
+#  with_items:
+#    - nova_api
+#    - nova
+#  tags:
+#    - nova-mysql
+#    - nova-mysql-delete
+#  when: inventory_hostname in groups['controller']
+#
+#
+#- name: Create a new database with name 'nova-api, nova'
+#  mysql_db:
+#    name: "{{ item }}"
+#    login_password: xxxx.123
+#    state: present
+#  with_items:
+#    - nova_api
+#    - nova
+#  tags:
+#    - nova-mysql
+#    - nova-mysql-create
+#  when: inventory_hostname in groups['controller']
+#
+#- name: Grant access to the DB nova and nova-api for the service
+#  mysql_user:
+#    login_user: root
+#    login_password: xxxx.123
+#    name: nova
+#    password: nova
+#    host: "{{ item[0] }}"
+#    state: "present"
+#    append_privs: true
+#    priv: "{{ item[1] }}.*:ALL"
+#  with_nested:
+#    - [ "localhost", "%"]
+#    - [ "nova", "nova_api"]
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - nova-mysql
+#    - nova-mysql-priv
+
+#- name: nova pip Install 
+#  pip:
+#    name: "{{item}}"
+#  with_items:
+#    - tox
+#  tags:
+#    - nova-pip
+
+#- name: Delete the nova data
+#  command: "{{ item }}"
+#  ignore_errors: true
+#  with_items:
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} user delete nova"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} service delete nova"
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - nova-mysql
+#
+#- name: Create the nova data
+#  command: "{{ item }}"
+#  with_items:
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} user create --domain default --password nova nova"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} role add --project service --user nova admin"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} service create --name nova --description 'OpenStack Compute' compute"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} endpoint create --region RegionOne compute public http://{{groups['controller'][0]}}:8774/v2.1"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} endpoint create --region RegionOne compute internal http://{{groups['controller'][0]}}:8774/v2.1"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} endpoint create --region RegionOne compute admin http://{{groups['controller'][0]}}:8774/v2.1"
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - nova-mysql
+
+#- name: Git clone nova code
+#  git:
+#    repo: https://git.openstack.org/openstack/nova.git
+#    dest: /root/workspace/openstack/src/nova
+#    version: stable/ocata
+#    update: no
+#  tags:
+#    - nova-git
+#
+#- name: tox-py27
+#  command: tox -e py27 --notest
+#  args:
+#    chdir: /root/workspace/openstack/src/nova
+#  tags:
+#    - nova-tox
+
+#- name: tox-genconfig tox-genpolicy
+#  command: tox -e genconfig,genpolicy
+#  args:
+#    chdir: /root/workspace/openstack/src/nova
+#  tags:
+#    - nova-tox
+#
+#- name: Copy nova conf file
+#  command: "{{ item }}"
+#  args:
+#    chdir: /root/workspace/openstack/src/nova/etc/nova
+#  with_items:
+#    - cp nova.conf.sample nova.conf
+#  tags:
+#    - nova-tox
+
+
+
+#- name: Nova conf file
+#  ini_file:
+#    path: /root/workspace/openstack/src/nova/etc/nova/nova.conf
+#    section: "{{ item.section }}"
+#    option: "{{ item.option }}"
+#    value: "{{ item.value }}"
+#  with_items:
+#    - { section: "DEFAULT", option: "enabled_apis", value: "osapi_compute,metadata" } 
+#    - { section: "database", option: "connection", value: "mysql+pymysql://nova:nova@{{ groups['controller'][0] }}/nova" } 
+#    - { section: "api_database", option: "connection", value: "mysql+pymysql://nova:nova@{{ groups['controller'][0] }}/nova_api" } 
+#    - { section: "DEFAULT", option: "transport_url", value: "rabbit://openstack:openstack@{{ groups['controller'][0] }}" } 
+#    - { section: "api", option: "auth_strategy", value: "keystone" } 
+#    - { section: "keystone_authtoken", option: "auth_uri", value: "http://{{ groups['controller'][0] }}:5000" }
+#    - { section: "keystone_authtoken", option: "auth_url", value: "http://{{ groups['controller'][0] }}:35357" }
+#    - { section: "keystone_authtoken", option: "memcached_servers", value: "{{ groups['controller'][0] }}:11211" }
+#    - { section: "keystone_authtoken", option: "auth_type", value: "password" }
+#    - { section: "keystone_authtoken", option: "project_domain_name", value: "default" }
+#    - { section: "keystone_authtoken", option: "user_domain_name", value: "default" }
+#    - { section: "keystone_authtoken", option: "project_name" , value: "service" }
+#    - { section: "keystone_authtoken", option: "username", value: "nova" }
+#    - { section: "keystone_authtoken", option: "password", value: "nova" }
+#    - { section: "DEFAULT", option: "my_ip", value: "{{ inventory_hostname }}" } 
+#    - { section: "DEFAULT", option: "use_neutron", value: "True" } 
+#    - { section: "DEFAULT", option: "firewall_driver", value: "nova.virt.firewall.NoopFirewallDriver" } 
+#    - { section: "vnc", option: "enabled", value: "True" } 
+#    - { section: "vnc", option: "vncserver_listen", value: "0.0.0.0" } 
+#    - { section: "vnc", option: "vncserver_proxyclient_address", value: "$my_ip" } 
+#    - { section: "vnc", option: "novncproxy_base_url", value: "http://{{ groups['controller'][0] }}:6080/vnc_auto.html" } 
+#    - { section: "glance", option: "api_servers", value: "http://{{ groups['controller'][0] }}:9292" } 
+#    - { section: "oslo_concurrency", option: "lock_path", value: "/var/lib/nova/tmp" } 
+#    - { section: "neutron", option: "url", value: "http://{{ groups['controller'][0] }}:9696" } 
+#    - { section: "neutron", option: "auth_url", value: "http://{{ groups['controller'][0] }}:35357" } 
+#    - { section: "neutron", option: "auth_type", value: "password" }
+#    - { section: "neutron", option: "project_domain_name", value: "default" }
+#    - { section: "neutron", option: "user_domain_name", value: "default" }
+#    - { section: "neutron", option: "region_name", value: "RegionOne" }
+#    - { section: "neutron", option: "project_name" , value: "service" }
+#    - { section: "neutron", option: "username", value: "neutron" }
+#    - { section: "neutron", option: "password", value: "neutron" }
+#    - { section: "neutron", option: "service_metadata_proxy", value: "true" }
+#    - { section: "neutron", option: "metadata_proxy_shared_secret", value: "" }
+#  tags:
+#    - nova-conf
+#
+#- name: Nova database sync
+#  command: "{{ item }}"
+#  with_items:
+#    - "{{ venv }}/nova-manage --config-file {{ conf_path }}/nova.conf api_db sync"
+#    - "{{ venv }}/nova-manage --config-file {{ conf_path }}/nova.conf db sync"
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - nova-manage
+#
+#- name: "Running nova in tmux"
+#  command: "{{ item }}"
+#  ignore_errors: true
+#  with_items:
+#    - tmux kill-session -t nova
+#  tags:
+#    - nova-run
+#  when: inventory_hostname in groups['controller']
+#
+#- name: "Running nova in tmux"
+#  command: "{{ item }}"
+#  with_items:
+#    - tmux new -d -s nova -n nova-api
+#    - tmux send-keys -t nova:0 "{{ venv }}/nova-api --config-file {{ conf_path }}/nova.conf" C-m
+#    - tmux neww -t nova:1 -n nova-scheduler
+#    - tmux send-keys -t nova:1 "{{ venv }}/nova-scheduler --config-file {{ conf_path }}/nova.conf" C-m
+#    - tmux neww -t nova:2 -n nova-conductor
+#    - tmux send-keys -t nova:2 "{{ venv }}/nova-conductor --config-file {{ conf_path }}/nova.conf" C-m
+#    - tmux neww -t nova:3 -n nova-consoleauth
+#    - tmux send-keys -t nova:3 "{{ venv }}/nova-consoleauth --config-file {{ conf_path }}/nova.conf" C-m
+#    - tmux neww -t nova:4 -n nova-novncproxy
+#    - tmux send-keys -t nova:4 "{{ venv }}/nova-novncproxy --config-file {{ conf_path }}/nova.conf" C-m
+#  tags:
+#    - nova-run
+#  when: inventory_hostname in groups['controller']
+#
+#- name: "Running nova-compute in tmux"
+#  command: "{{ item }}"
+#  ignore_errors: true
+#  with_items:
+#    - tmux kill-session -t nova
+#  tags:
+#    - nova-run
+#    - nova-computer-run
+#  when: inventory_hostname in groups['computer']
+#
+#- name: "Running nova-compute in tmux"
+#  command: "{{ item }}"
+#  with_items:
+#    - tmux new -d -s nova -n nova-compute
+#    - tmux send-keys -t nova:0 "{{ venv }}/nova-compute --config-file {{ conf_path }}/nova.conf" C-m
+#  tags:
+#    - nova-run
+#    - nova-computer-run
+#  when: inventory_hostname in groups['computer']
+#

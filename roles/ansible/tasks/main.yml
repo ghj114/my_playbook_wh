@@ -1,0 +1,12 @@
+---
+# tasks file for roles/ansible
+# 
+
+- include: "ansible_depend.yml"
+  static: no
+
+- include: "ansible_install.yml"
+  static: no
+
+- include: "ansible_start.yml"
+  static: no

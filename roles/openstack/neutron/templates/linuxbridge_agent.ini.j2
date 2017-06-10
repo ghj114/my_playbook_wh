@@ -1,0 +1,7 @@
+[linux_bridge]
+physical_interface_mappings = provider:br-provider
+[vxlan]
+enable_vxlan = false
+[securitygroup]
+enable_security_group = true
+firewall_driver = neutron.agent.linux.iptables_firewall.IptablesFirewallDriver

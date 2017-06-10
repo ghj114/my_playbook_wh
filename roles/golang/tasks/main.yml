@@ -1,0 +1,32 @@
+---
+# tasks file for roles/golang
+- name: Download golang Official binary distributions
+  get_url: 
+    url: 'https://storage.googleapis.com/golang/go{{ golang_version }}.linux-amd64.tar.gz' 
+    dest: "{{ golang_dir }}src"
+- name: Mkdir golang directory
+  file:
+    path: "{{ item.dir }}"
+    state: directory
+  with_items:
+  - { dir: "{{ golang_dir }}golang{{ golang_version }}/libgo" }
+- name: tar -zxvf go
+  unarchive:
+    src: "{{ golang_dir }}src/go{{ golang_version }}.linux-amd64.tar.gz"
+    dest: "{{ golang_dir }}golang{{ golang_version }}"
+    remote_src: True
+- name: Profile go.sh
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "root"
+    group: "root"
+    mode: "0640"
+    backup: "yes"
+  with_items:
+    - src: "go.sh.j2"
+      dest: "/etc/profile.d/go.sh"
+  tags:
+    - golang-config
+
+

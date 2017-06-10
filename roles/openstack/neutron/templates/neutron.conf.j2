@@ -1,0 +1,31 @@
+[DEFAULT]
+debug = true
+core_plugin = ml2
+service_plugins =
+transport_url = rabbit://openstack:openstack@{{ groups['controller'][0] }}
+auth_strategy = keystone
+notify_nova_on_port_status_changes = true
+notify_nova_on_port_data_changes = true
+[database]
+connection = mysql+pymysql://{{ neutron_mysql_user }}:{{ neutron_mysql_password }}@{{ groups['controller'][0] }}/{{ neutron_mysql_database }}
+[keystone_authtoken]
+auth_uri = http://{{ groups['controller'][0] }}:5000
+auth_url = http://{{ groups['controller'][0] }}:35357
+memcached_servers = {{ groups['controller'][0] }}:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = {{ neutron_mysql_user }}
+password = {{ neutron_mysql_password }}
+[nova]
+auth_url = http://{{ groups['controller'][0] }}:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = nova
+password = nova
+[oslo_concurrency]
+lock_path = /var/lib/neutron/tmp

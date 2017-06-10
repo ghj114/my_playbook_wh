@@ -1,0 +1,34 @@
+---
+# tasks file for roles/openstack/horizon
+- name: setup kvim vimrc
+  lineinfile:
+    path: "{{ kvim_dir }}/vimrc.bundles"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - {regexp: '^OPENSTACK_HOST', line: "OPENSTACK_HOST = '{{ groups['controller'][0] }}'"} 
+    - {regexp: '^#ALLOWED_HOSTS', line: "ALLOWED_HOSTS = ['*']"}
+    - {regexp: '^OPENSTACK_KEYSTONE_URL', line: 'OPENSTACK_KEYSTONE_URL = "http://%s:5000/v3" % OPENSTACK_HOST'}
+
+- name: setup horizon conf
+  blockinfile:
+    path: "{{ horizon_git_clone_dir }}/openstack_dashboard/local/local_settings.py"
+    insertbefore: "#OPENSTACK_API_VERSIONS"
+    block: |
+      OPENSTACK_API_VERSIONS = {
+         "identity": 3,
+         "image": 2,
+         "volume": 2,
+    }
+
+#- name: setup horizon conf
+#  blockinfile:
+#    path: "{{ horizon_git_clone_dir }}/openstack_dashboard/local/local_settings.py"
+#    block: |
+#      CACHES = {
+#          'default': {
+#          'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+#          'LOCATION': "groups['controller'][0]:11211",
+#          }
+#    }
+

@@ -1,0 +1,19 @@
+---
+# tasks file for roles/tmux
+
+- name: yum install tmux
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - tmux
+  tags:
+    - install-tmux
+
+
+- name: Configure tmux ~/.tmux.conf
+  template:
+    src: tmux.conf.j2
+    dest: ~/.tmux.conf
+
+

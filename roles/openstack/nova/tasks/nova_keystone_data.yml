@@ -1,0 +1,30 @@
+---
+
+- name: Delete the nova data
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+      - "{{ openstack_bin }} {{keystone_admin_env}} user delete nova"
+      - "{{ openstack_bin }} {{keystone_admin_env}} service delete nova"
+      #- "{{ openstack_bin }} {{keystone_admin_env}} user delete placement"
+      #- "{{ openstack_bin }} {{keystone_admin_env}} service delete placement"
+
+- name: Create the nova data
+  command: "{{ item }}"
+  with_items:
+      - "{{ openstack_bin }} {{keystone_admin_env}} user create --domain default --password nova nova"
+      - "{{ openstack_bin }} {{keystone_admin_env}} role add --project service --user nova admin"
+      - "{{ openstack_bin }} {{keystone_admin_env}} service create --name nova --description 'OpenStack Compute' compute"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne compute public http://{{groups['controller'][0]}}:8774/v2.1"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne compute internal http://{{groups['controller'][0]}}:8774/v2.1"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne compute admin http://{{groups['controller'][0]}}:8774/v2.1"
+      #- "{{ openstack_bin }} {{keystone_admin_env}} user create --domain default --password placement placement"
+      #- "{{ openstack_bin }} {{keystone_admin_env}} role add --project service --user placement admin"
+      #- "{{ openstack_bin }} {{keystone_admin_env}} service create --name placement --description 'Plancement API' placement"
+      #- "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne placement public http://{{groups['controller'][0]}}/placement"
+      #- "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne placement internal http://{{groups['controller'][0]}}/placement"
+      #- "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne placement admin http://{{groups['controller'][0]}}/placement"
+
+
+
+

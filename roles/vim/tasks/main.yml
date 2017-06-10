@@ -1,0 +1,14 @@
+---
+# tasks file for roles/vim
+#
+- include: "kvim-depend-{{ os_version }}.yml"
+  static: no
+
+- include: "kvim-pip-depend.yml"
+  static: no
+ 
+- include: "kvim-install.yml"
+  static: no
+
+#- include: "kvim-config.yml"
+#  static: no

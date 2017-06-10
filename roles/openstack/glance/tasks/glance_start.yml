@@ -1,0 +1,23 @@
+---
+
+- name: "Running glance in tmux"
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+    - tmux kill-session -t glance
+  tags:
+    - glance-run
+  when: inventory_hostname in groups['controller']
+
+- name: "Running glance in tmux"
+  command: "{{ item }}"
+  with_items:
+    - "{{ glance_bin_path }}pip install python-memcached"
+    - tmux new -d -s glance -n glance-api
+    - tmux send-keys -t glance:0 "{{ glance_bin_path }}glance-api --config-file {{ glance_conf_path }}/glance-api.conf" C-m
+    - tmux neww -t glance:1 -n glance-registry
+    - tmux send-keys -t glance:1 "{{ glance_bin_path }}glance-registry --config-file {{ glance_conf_path }}/glance-registry.conf" C-m
+  tags:
+    - glance-run
+  when: inventory_hostname in groups['controller']
+

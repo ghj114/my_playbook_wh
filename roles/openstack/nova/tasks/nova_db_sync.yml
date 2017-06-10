@@ -1,0 +1,12 @@
+---
+
+
+- name: Nova database sync
+  command: "{{ item }}"
+  with_items:
+    - "{{ nova_bin_path ~ 'nova-manage' }} --config-file {{ nova_conf }} api_db sync"
+    #- "{{ nova_bin_path ~ 'nova-manage' }} --config-file {{ nova_conf }} cell_v2 map_cell0"
+    #- "{{ nova_bin_path ~ 'nova-manage' }} --config-file {{ nova_conf }} cell_v2 create_cell --name=cell1 --verbose"
+    - "{{ nova_bin_path ~ 'nova-manage' }} --config-file {{ nova_conf }} db sync"
+
+

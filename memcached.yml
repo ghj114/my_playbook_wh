@@ -1,0 +1,10 @@
+- name: Install memcached
+  hosts: 
+    - controller
+  gather_facts: "{{ gather_facts | default(True) }}"
+  max_fail_percentage: 0
+  remote_user: root
+  roles:
+    - role: memcached
+  tags:
+    - memcached

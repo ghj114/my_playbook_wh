@@ -1,0 +1,16 @@
+- name: Install ansible
+  hosts: 
+    - test
+  gather_facts: "{{ gather_facts | default(True) }}"
+  #gather_facts: no
+  max_fail_percentage: 20
+  remote_user: root
+  roles:
+    - role: system/yum
+    - role: tmux
+    - role: ansible
+  vars:
+    ansible_dir: /usr/local/src/ansible
+    version: 'Debian'
+  tags:
+    - ansible

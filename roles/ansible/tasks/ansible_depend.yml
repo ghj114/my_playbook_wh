@@ -1,0 +1,24 @@
+---
+# tasks file for roles/vim
+#
+- name: yum install epel
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - epel-release
+  tags:
+    - ansible-install-depend
+
+- name: yum install packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - gcc
+    - python-devel
+    - openssl-devel
+    - sshpass
+  tags:
+    - ansible-centos-depend
+

@@ -1,0 +1,18 @@
+---
+
+- name: Delete the glance data
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+      - "{{ openstack_bin }} {{keystone_admin_env}} user delete glance"
+      - "{{ openstack_bin }} {{keystone_admin_env}} service delete glance"
+
+- name: Create the glance data
+  command: "{{ item }}"
+  with_items:
+      - "{{ openstack_bin }} {{keystone_admin_env}} user create --domain default --password glance glance"
+      - "{{ openstack_bin }} {{keystone_admin_env}} role add --project service --user glance admin"
+      - "{{ openstack_bin }} {{keystone_admin_env}} service create --name glance --description 'OpenStack Image' image"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne image public http://{{groups['controller'][0]}}:9292"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne image internal http://{{groups['controller'][0]}}:9292"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne image admin http://{{groups['controller'][0]}}:9292"

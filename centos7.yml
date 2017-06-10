@@ -1,0 +1,11 @@
+- name: Centos7 yum pip
+  hosts: 
+    - computer
+  gather_facts: "{{ gather_facts | default(True) }}"
+  max_fail_percentage: 20
+  remote_user: root
+  roles:
+    - role: "system/yum"
+    #- role: "system/pip"
+  tags:
+    - yum-config

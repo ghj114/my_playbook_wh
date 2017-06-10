@@ -1,0 +1,11 @@
+- name: Test
+  hosts: 
+    - controller
+  gather_facts: "{{ gather_facts | default(True) }}"
+  max_fail_percentage: 20
+  remote_user: root
+  tasks:
+    - name: test all.yml
+      command: echo {{ openstack_release }} > os.txt 
+  tags:
+    - test

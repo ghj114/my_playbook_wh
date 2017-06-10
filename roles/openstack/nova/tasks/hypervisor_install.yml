@@ -1,0 +1,18 @@
+---
+
+- name: yum install nova-compute kvm qemu libvirt
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    #- kvm
+    #- qemu-kvm
+    #- libvirt
+    #- libvirt-devel
+    #- libvirt-python
+    - openstack-nova-compute
+  when: inventory_hostname in groups['computer']
+  tags:
+    - hypervisor-installed
+
+

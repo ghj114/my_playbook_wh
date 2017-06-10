@@ -1,0 +1,57 @@
+[DEFAULT]
+debug = true
+enabled_apis = osapi_compute,metadata
+transport_url = rabbit://openstack:openstack@{{ groups['controller'][0] }}
+my_ip = {{ inventory_hostname }}
+use_neutron = True
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+compute_driver = libvirt.LibvirtDriver
+[database]
+connection = mysql+pymysql://{{ nova_mysql_user }}:{{ nova_mysql_password }}@{{ groups['controller'][0] }}/{{ nova_mysql_database }}
+[api_database]
+connection = mysql+pymysql://{{ nova_api_mysql_user }}:{{ nova_api_mysql_password }}@{{ groups['controller'][0] }}/{{ nova_api_mysql_database }}
+[api]
+auth_strategy = keystone
+[keystone_authtoken]
+auth_uri = http://{{ groups['controller'][0] }}:5000
+auth_url = http://{{ groups['controller'][0] }}:35357
+memcached_servers = {{ groups['controller'][0] }}:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = {{ nova_mysql_user }}
+password = {{ nova_mysql_password }}
+[vnc]
+enabled = True
+vncserver_listen = 0.0.0.0
+vncserver_proxyclient_address = $my_ip
+novncproxy_base_url = http://{{ groups['controller'][0] }}:6080/vnc_auto.html
+[glance]
+api_servers = http://{{ groups['controller'][0] }}:9292
+[oslo_concurrency]
+lock_path = /var/lib/nova/tmp
+[libvirt]
+virt_type = kvm
+#[placement]
+#os_region_name = RegionOne
+#project_domain_name = default
+#project_name = service
+#auth_type = password
+#user_domain_name = default
+#auth_url = http://{{ groups['controller'][0] }}:35357
+#username = placement
+#password = placement
+[neutron]
+url = http://{{ groups['controller'][0] }}:9696
+auth_url = http://{{ groups['controller'][0] }}:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = neutron
+service_metadata_proxy = true
+#metadata_proxy_shared_secret = METADATA_SECRET
+

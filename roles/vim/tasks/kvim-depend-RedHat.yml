@@ -1,0 +1,24 @@
+---
+# tasks file for roles/vim
+#
+- name: yum install epel
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - epel-release
+  tags:
+    - kvim-install-depend
+
+- name: yum install packages
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-devel
+    - the_silver_searcher
+    - cmake
+  tags:
+    - kvim-centos-depend
+
+

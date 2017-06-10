@@ -1,0 +1,31 @@
+---
+
+- name: Git clone nova code
+  git:
+    repo: "{{ git_base_repo }}/nova.git"
+    dest: "{{ nova_git_clone_dir }}"
+    version: "{{ nova_version }}"
+    update: no
+  tags:
+    - nova-git
+    - nova-install
+
+- name: Git clone novnc code
+  git:
+    repo: "https://github.com/novnc/noVNC.git"
+    dest: "{{ novnc_git_clone_dir }}"
+    update: no
+  tags:
+    - nova-git
+    - nova-install
+
+
+- name: tox-py27
+  command: tox -e py27 --notest
+  args:
+    chdir: "{{ nova_git_clone_dir }}"
+  tags:
+    - nova-tox
+    - nova-install
+
+

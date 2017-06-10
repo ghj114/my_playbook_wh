@@ -1,0 +1,27 @@
+---
+# tasks file for roles/vim
+#
+- name: Git clone ansible code
+  git:
+    repo: git://github.com/ansible/ansible.git
+    dest: "{{ ansible_dir }}"
+    update: no
+  tags:
+    - ansible-clone
+
+- name: "Install ansible"
+  shell: "{{ item }}"
+  args:
+    chdir: "{{ ansible_dir }}"
+  with_items:
+    - source hacking/env-setup && pip install -r ./requirements.txt
+  tags:
+    - ansible-install
+
+#- include: kvim-config.yml
+#  static: no
+#  tags:
+#   - kvim-config
+
+
+

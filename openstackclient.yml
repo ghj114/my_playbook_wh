@@ -1,0 +1,12 @@
+- name: Install openstackclient
+  hosts: 
+    - controller
+  gather_facts: "{{ gather_facts | default(True) }}"
+  max_fail_percentage: 20
+  remote_user: root
+  roles:
+    - role: "openstack/openstackclient"
+  vars_files:
+    - defaults/openstackclient_all.yml
+  tags:
+    - install-openstackclient

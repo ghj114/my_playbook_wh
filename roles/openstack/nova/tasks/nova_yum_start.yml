@@ -1,0 +1,25 @@
+---
+
+- name: "Mkdir nova directory"
+  file: 
+    path: "{{ item.dir }}"
+    state: directory
+    owner: "{{ item.ug }}"
+    group: "{{ item.ug }}"
+  with_items:
+    - { dir: '/data/_openstack', ug: 'root' }
+    - { dir: '/data/_openstack/nova', ug: 'nova'}
+    - { dir: '/data/_openstack/nova/instances', ug: 'nova'}
+  when: inventory_hostname in groups['computer']
+  tags:
+    - nova-run
+
+- name: Start openstack-nova-compute.service
+  systemd:
+    name: openstack-nova-compute.service
+    state: started
+    enabled: True
+  when: inventory_hostname in groups['computer']
+  tags:
+    - nova-compute-start
+
