@@ -25,11 +25,11 @@
   vars_files:
     - defaults/nova_all.yml
   vars:
-    hostname_prefix: "TN-{{ ('controller' in group_names ) | ternary('controller', 'computer') }}"
-    hostname_var: "{{ hostname_prefix ~ '-' ~ ansible_default_ipv4['address'].replace('.', '-') }}"
-    ntp_server: "10.100.63.11"
+    hostname_prefix: "{{ ('controller' in group_names ) | ternary('controller', 'computer') }}"
+    hostname_var: "{{ hostname_prefix ~ '-' ~ ansible_default_ipv4['address'].replace('.', '-') ~ '-TN' }}"
+    ntp_server: "10.100.13.243"
     extra_repository: ["epel-release", "centos-release-openstack-{{ openstack_release }}"]
     #extra_packages: [git, vim, wget, bash-completion, iftop, net-tools, tcpdump, gcc, postgresql, postgresql-devel, python-devel, libffi-devel, python-devel, openssl-devel,  openldap-devel]
-    extra_packages: [git, vim, wget, bash-completion, iftop, net-tools, tcpdump ]
+    extra_packages: [git, vim, wget, bash-completion, iftop, net-tools, tcpdump, telnet]
   tags:
     - nova
