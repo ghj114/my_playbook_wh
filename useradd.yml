@@ -39,11 +39,11 @@
     #  with_items: "{{ sudoers }}"
       #when: "{{ item.changed == true }}"
   vars:
-    #gp_name: develop
+    gp_name: develop
     #gp_name: dba
-    gp_name: app
+    #gp_name: app
     sudoers:
-      - name: xxxx
+      - name: yanfa
       #- name: zhangjin
       #  password: "{{ 'xLb17YcV' | password_hash('sha512') }}"
   tags:

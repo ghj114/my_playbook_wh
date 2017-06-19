@@ -30,7 +30,7 @@
     - ovs-vsctl --if-exists del-br br-provider
     - ovs-vsctl add-br br-provider
     #- ovs-vsctl add-port br-provider em4
-    - ovs-vsctl add-bond br-provider bond0 em2 em3
+    - ovs-vsctl add-bond br-provider bond0 em3 em4
   tags:
     - ovs-create-bridge
   when: inventory_hostname in groups['computer']

@@ -5,7 +5,9 @@
     - test
   gather_facts: "{{ gather_facts | default(True) }}"
   max_fail_percentage: 20
-  remote_user: root
+  #remote_user: root
+  remote_user: zhanghaifeng
+  #become: yes
   roles:
     - role: "tmux"
   tags:

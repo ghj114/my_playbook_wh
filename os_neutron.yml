@@ -13,10 +13,14 @@
         password: "{{ neutron_mysql_password }}"
         db_name: "{{ neutron_mysql_database }}"
       when: "'mysql' in group_names" 
+    - include: common-tasks/network-script.yml
+      static: no
   roles:
     #- role: system/yum
     - role: openstack/neutron
   vars_files:
     - defaults/neutron_all.yml
+  vars:
+    interface: ['em3','em4']
   tags:
     - neutron

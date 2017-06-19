@@ -1,4 +1,9 @@
 [DEFAULT]
-interface_driver = linuxbridge
+ovs_use_veth = false
+interface_driver = openvswitch
 dhcp_driver = neutron.agent.linux.dhcp.Dnsmasq
 enable_isolated_metadata = true
+force_metadata = true
+dnsmasq_base_log_dir = /var/log/neutron/
+debug = true
+[AGENT]

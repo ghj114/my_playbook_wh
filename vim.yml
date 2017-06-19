@@ -4,12 +4,16 @@
   gather_facts: "{{ gather_facts | default(True) }}"
   #gather_facts: no
   max_fail_percentage: 20
-  remote_user: root
+  #remote_user: root
+  remote_user: zhanghaifeng
+  become: yes
   roles:
-    - role: system/apt
+    #- role: system/apt
     - role: "vim"
   vars:
-    kvim_dir: /usr/local/src/kvim
-    os_version: 'Debian'
+    kvim_dir: /home/zhanghaifeng/src/kvim
+    os_version: 'RedHat'
+    #kvim_dir: /usr/local/src/kvim
+    #os_version: 'Debian'
   tags:
     - vim

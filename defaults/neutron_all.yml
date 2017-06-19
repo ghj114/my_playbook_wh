@@ -13,6 +13,6 @@ neutron_log: "{{ log_dir ~ '/neutron'}}"
 #neutron_conf_template: "neutron_tn.conf.j2"
 #ml2_conf_template: "ml2_tn_conf.ini.j2"
 neutron_conf_template: "neutron_tn_pro.conf.j2"
-ml2_conf_template: "ml2_tnpro_conf.ini.j2"
+ml2_conf_template: "ml2_vlan_tnpro_conf.ini.j2"
 
 
