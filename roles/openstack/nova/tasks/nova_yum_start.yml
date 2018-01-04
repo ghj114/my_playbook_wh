@@ -1,4 +1,18 @@
 ---
+- name: Start openstack-nova-controller.service
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: True
+  with_items:
+    - openstack-nova-api.service
+    - openstack-nova-scheduler.service
+    - openstack-nova-conductor.service
+    - openstack-nova-consoleauth.service
+    - openstack-nova-novncproxy.service
+  when: inventory_hostname in groups['controller']
+  tags:
+    - nova-controller-start
 
 - name: "Mkdir nova directory"
   file: 

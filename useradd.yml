@@ -27,9 +27,9 @@
         group: "{{ gp_name }}"
         shell: /bin/bash
         expires: 0
+        password: "{{ lookup('password', 'userpassword/{{ item.name }}.txt length=8') | password_hash('sha512') }}"
         #password: "{{ lookup('passwordstore', 'passwd.txt create=true') }}"
         #password: "{{ lookup('passwordstore', 'passwd.txt create=true') | password_hash('sha512') }}"
-        password: "{{ lookup('password', 'userpassword/{{ item.name }}.txt length=8') | password_hash('sha512') }}"
         #password: "{{ '123456' | password_hash('sha512') }}"
         #password: "{{ lookup('password', 'passwd.txt length=8 encrypt=sha512_crypt') }}"
         #password: "{{item.password}}"
@@ -39,11 +39,11 @@
     #  with_items: "{{ sudoers }}"
       #when: "{{ item.changed == true }}"
   vars:
-    gp_name: develop
-    #gp_name: dba
-    #gp_name: app
+    gp_name: develop # dba app
     sudoers:
-      - name: yanfa
+      - name: yanfa3
+      - name: yanfa1
+      - name: yanfa2
       #- name: zhangjin
       #  password: "{{ 'xLb17YcV' | password_hash('sha512') }}"
   tags:

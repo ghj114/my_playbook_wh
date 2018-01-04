@@ -12,7 +12,8 @@
         user_name: "{{ neutron_mysql_user }}"
         password: "{{ neutron_mysql_password }}"
         db_name: "{{ neutron_mysql_database }}"
-      when: "'mysql' in group_names" 
+      #when: "'mysql' in group_names" 
+      when: inventory_hostname in groups['controller']
     - include: common-tasks/network-script.yml
       static: no
   roles:
@@ -21,6 +22,7 @@
   vars_files:
     - defaults/neutron_all.yml
   vars:
-    interface: ['em3','em4']
+    #interface: ['em3','em4']
+    interface: ['p5p1','p5p2']
   tags:
     - neutron

@@ -4,8 +4,8 @@
   command: "{{ item }}"
   with_items:
     - "{{ keystone_bin_path ~ 'keystone-manage' }} --config-file {{ keystone_conf_path }}/keystone.conf db_sync"
-    - "{{ keystone_bin_path ~ 'keystone-manage' }} --config-file {{ keystone_conf_path }}/keystone.conf fernet_setup --keystone-user root --keystone-group root"
-    - "{{ keystone_bin_path ~ 'keystone-manage' }} --config-file {{ keystone_conf_path }}/keystone.conf bootstrap --bootstrap-password admin \
+    - "{{ keystone_bin_path ~ 'keystone-manage' }} --config-file {{ keystone_conf_path }}/keystone.conf fernet_setup --keystone-user keystone --keystone-group keystone"
+    - "{{ keystone_bin_path ~ 'keystone-manage' }} --config-file {{ keystone_conf_path }}/keystone.conf bootstrap --bootstrap-password xxxxxx.c0m \
                                  --bootstrap-admin-url http://{{ groups['controller'][0] }}:35357/v3/ \
                                  --bootstrap-internal-url http://{{ groups['controller'][0] }}:5000/v3/ \
                                  --bootstrap-public-url http://{{ groups['controller'][0] }}:5000/v3/ \

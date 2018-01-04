@@ -7,6 +7,12 @@
   tags:
     - glance-developer-install
 
+- include: glance_yum_install.yml
+  static: no
+  when: glance_developer_mode | bool == false
+  tags:
+    - glance-yum-install
+
 - include: glance_config.yml
   static: no
   tags:
@@ -14,24 +20,29 @@
 
 - include: glance_db_sync.yml
   static: no
-  when: inventory_hostname in groups['controller']
+  when: inventory_hostname in groups['glance']
   tags:
     - glance-db-sync
 
 
 - include: glance_keystone_data.yml
   static: no
-  when: inventory_hostname in groups['controller']
+  when: inventory_hostname in groups['glance']
   tags:
     - glance-keystone-data
 
-- include: glance_start.yml
+#- include: glance_start.yml
+#  static: no
+#  when: inventory_hostname in groups['glance']
+#  tags:
+#    - glance-start
+
+
+- include: glance_yum_start.yml
   static: no
-  when: inventory_hostname in groups['controller']
+  when: inventory_hostname in groups['glance']
   tags:
     - glance-start
-
-
 
 #- name: Create a new database with name 'glance'
 #  mysql_db:

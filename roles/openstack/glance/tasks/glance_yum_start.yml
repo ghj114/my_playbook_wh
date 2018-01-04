@@ -1,0 +1,28 @@
+---
+
+- name: "Mkdir glance  directory"
+  file: 
+    path: "{{ item.dir }}"
+    state: directory
+    owner: "{{ item.ug }}"
+    group: "{{ item.ug }}"
+  with_items:
+    - { dir: '/data/_openstack', ug: 'root' }
+    - { dir: '/data/_openstack/glance', ug: 'glance'}
+    - { dir: '/data/_openstack/glance/images', ug: 'glance'}
+  when: inventory_hostname in groups['glance']
+  tags:
+    - glance-run
+
+- name: Start glance.service
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: True
+  with_items:
+    - openstack-glance-api.service
+    - openstack-glance-registry.service
+  when: inventory_hostname in groups['glance']
+  tags:
+    - glance-compute-start
+

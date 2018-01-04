@@ -1,0 +1,19 @@
+---
+
+- name: Generate cinder config
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: "root"
+    group: "{{ cinder_developer_mode | bool | ternary('root', 'cinder') }}"
+    mode: "0640"
+    backup: "yes"
+  with_items:
+    - src: "{{ cinder_conf_template }}"
+      dest: "{{ cinder_developer_mode | bool | ternary(cinder_git_clone_dir ~ '/etc/cinder/cinder.conf', '/etc/cinder/cinder.conf') }}"
+  #notify: Restart cinder compute
+  tags:
+    - cinder-config
+    - cinder-post-install
+
+

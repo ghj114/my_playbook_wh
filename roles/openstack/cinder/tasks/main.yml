@@ -1,0 +1,249 @@
+---
+
+- include: cinder_yum_install.yml
+  static: no
+  when: cinder_developer_mode | bool == false
+  tags:
+    - cinder-yum-install
+
+
+- include: cinder_config.yml
+  static: no
+  tags:
+    - cinder-config
+
+- include: cinder_db_sync.yml
+  static: no
+  when: inventory_hostname in groups['controller']
+  tags:
+    - cinder-db-sync
+
+
+- include: cinder_keystone_data.yml
+  static: no
+  when: inventory_hostname in groups['controller']
+  tags:
+    - cinder-keystone_data
+
+- include: cinder_start.yml
+  static: no
+  when: cinder_developer_mode | bool
+  tags:
+    - cinder-start
+
+- include: cinder_yum_start.yml
+  static: no
+  when: cinder_developer_mode | bool == false
+  tags:
+    - cinder-start
+
+# tasks file for roles/openstack/cinder
+#- name: Delete databases
+#  mysql_db:
+#    name: "{{ item }}"
+#    login_password: xxxx.123
+#    state: absent
+#  with_items:
+#    - cinder_api
+#    - cinder
+#  tags:
+#    - cinder-mysql
+#    - cinder-mysql-delete
+#  when: inventory_hostname in groups['controller']
+#
+#
+#- name: Create a new database with name 'cinder-api, cinder'
+#  mysql_db:
+#    name: "{{ item }}"
+#    login_password: xxxx.123
+#    state: present
+#  with_items:
+#    - cinder_api
+#    - cinder
+#  tags:
+#    - cinder-mysql
+#    - cinder-mysql-create
+#  when: inventory_hostname in groups['controller']
+#
+#- name: Grant access to the DB cinder and cinder-api for the service
+#  mysql_user:
+#    login_user: root
+#    login_password: xxxx.123
+#    name: cinder
+#    password: cinder
+#    host: "{{ item[0] }}"
+#    state: "present"
+#    append_privs: true
+#    priv: "{{ item[1] }}.*:ALL"
+#  with_nested:
+#    - [ "localhost", "%"]
+#    - [ "cinder", "cinder_api"]
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - cinder-mysql
+#    - cinder-mysql-priv
+
+#- name: cinder pip Install 
+#  pip:
+#    name: "{{item}}"
+#  with_items:
+#    - tox
+#  tags:
+#    - cinder-pip
+
+#- name: Delete the cinder data
+#  command: "{{ item }}"
+#  ignore_errors: true
+#  with_items:
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} user delete cinder"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} service delete cinder"
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - cinder-mysql
+#
+#- name: Create the cinder data
+#  command: "{{ item }}"
+#  with_items:
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} user create --domain default --password cinder cinder"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} role add --project service --user cinder admin"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} service create --name cinder --description 'OpenStack Compute' compute"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} endpoint create --region RegionOne compute public http://{{groups['controller'][0]}}:8774/v2.1"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} endpoint create --region RegionOne compute internal http://{{groups['controller'][0]}}:8774/v2.1"
+#      - "{{osclient_venv}}/openstack {{keystone_admin_env}} endpoint create --region RegionOne compute admin http://{{groups['controller'][0]}}:8774/v2.1"
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - cinder-mysql
+
+#- name: Git clone cinder code
+#  git:
+#    repo: https://git.openstack.org/openstack/cinder.git
+#    dest: /root/workspace/openstack/src/cinder
+#    version: stable/ocata
+#    update: no
+#  tags:
+#    - cinder-git
+#
+#- name: tox-py27
+#  command: tox -e py27 --notest
+#  args:
+#    chdir: /root/workspace/openstack/src/cinder
+#  tags:
+#    - cinder-tox
+
+#- name: tox-genconfig tox-genpolicy
+#  command: tox -e genconfig,genpolicy
+#  args:
+#    chdir: /root/workspace/openstack/src/cinder
+#  tags:
+#    - cinder-tox
+#
+#- name: Copy cinder conf file
+#  command: "{{ item }}"
+#  args:
+#    chdir: /root/workspace/openstack/src/cinder/etc/cinder
+#  with_items:
+#    - cp cinder.conf.sample cinder.conf
+#  tags:
+#    - cinder-tox
+
+
+
+#- name: Nova conf file
+#  ini_file:
+#    path: /root/workspace/openstack/src/cinder/etc/cinder/cinder.conf
+#    section: "{{ item.section }}"
+#    option: "{{ item.option }}"
+#    value: "{{ item.value }}"
+#  with_items:
+#    - { section: "DEFAULT", option: "enabled_apis", value: "osapi_compute,metadata" } 
+#    - { section: "database", option: "connection", value: "mysql+pymysql://cinder:cinder@{{ groups['controller'][0] }}/cinder" } 
+#    - { section: "api_database", option: "connection", value: "mysql+pymysql://cinder:cinder@{{ groups['controller'][0] }}/cinder_api" } 
+#    - { section: "DEFAULT", option: "transport_url", value: "rabbit://openstack:openstack@{{ groups['controller'][0] }}" } 
+#    - { section: "api", option: "auth_strategy", value: "keystone" } 
+#    - { section: "keystone_authtoken", option: "auth_uri", value: "http://{{ groups['controller'][0] }}:5000" }
+#    - { section: "keystone_authtoken", option: "auth_url", value: "http://{{ groups['controller'][0] }}:35357" }
+#    - { section: "keystone_authtoken", option: "memcached_servers", value: "{{ groups['controller'][0] }}:11211" }
+#    - { section: "keystone_authtoken", option: "auth_type", value: "password" }
+#    - { section: "keystone_authtoken", option: "project_domain_name", value: "default" }
+#    - { section: "keystone_authtoken", option: "user_domain_name", value: "default" }
+#    - { section: "keystone_authtoken", option: "project_name" , value: "service" }
+#    - { section: "keystone_authtoken", option: "username", value: "cinder" }
+#    - { section: "keystone_authtoken", option: "password", value: "cinder" }
+#    - { section: "DEFAULT", option: "my_ip", value: "{{ inventory_hostname }}" } 
+#    - { section: "DEFAULT", option: "use_neutron", value: "True" } 
+#    - { section: "DEFAULT", option: "firewall_driver", value: "cinder.virt.firewall.NoopFirewallDriver" } 
+#    - { section: "vnc", option: "enabled", value: "True" } 
+#    - { section: "vnc", option: "vncserver_listen", value: "0.0.0.0" } 
+#    - { section: "vnc", option: "vncserver_proxyclient_address", value: "$my_ip" } 
+#    - { section: "vnc", option: "novncproxy_base_url", value: "http://{{ groups['controller'][0] }}:6080/vnc_auto.html" } 
+#    - { section: "glance", option: "api_servers", value: "http://{{ groups['controller'][0] }}:9292" } 
+#    - { section: "oslo_concurrency", option: "lock_path", value: "/var/lib/cinder/tmp" } 
+#    - { section: "neutron", option: "url", value: "http://{{ groups['controller'][0] }}:9696" } 
+#    - { section: "neutron", option: "auth_url", value: "http://{{ groups['controller'][0] }}:35357" } 
+#    - { section: "neutron", option: "auth_type", value: "password" }
+#    - { section: "neutron", option: "project_domain_name", value: "default" }
+#    - { section: "neutron", option: "user_domain_name", value: "default" }
+#    - { section: "neutron", option: "region_name", value: "RegionOne" }
+#    - { section: "neutron", option: "project_name" , value: "service" }
+#    - { section: "neutron", option: "username", value: "neutron" }
+#    - { section: "neutron", option: "password", value: "neutron" }
+#    - { section: "neutron", option: "service_metadata_proxy", value: "true" }
+#    - { section: "neutron", option: "metadata_proxy_shared_secret", value: "" }
+#  tags:
+#    - cinder-conf
+#
+#- name: Nova database sync
+#  command: "{{ item }}"
+#  with_items:
+#    - "{{ venv }}/cinder-manage --config-file {{ conf_path }}/cinder.conf api_db sync"
+#    - "{{ venv }}/cinder-manage --config-file {{ conf_path }}/cinder.conf db sync"
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - cinder-manage
+#
+#- name: "Running cinder in tmux"
+#  command: "{{ item }}"
+#  ignore_errors: true
+#  with_items:
+#    - tmux kill-session -t cinder
+#  tags:
+#    - cinder-run
+#  when: inventory_hostname in groups['controller']
+#
+#- name: "Running cinder in tmux"
+#  command: "{{ item }}"
+#  with_items:
+#    - tmux new -d -s cinder -n cinder-api
+#    - tmux send-keys -t cinder:0 "{{ venv }}/cinder-api --config-file {{ conf_path }}/cinder.conf" C-m
+#    - tmux neww -t cinder:1 -n cinder-scheduler
+#    - tmux send-keys -t cinder:1 "{{ venv }}/cinder-scheduler --config-file {{ conf_path }}/cinder.conf" C-m
+#    - tmux neww -t cinder:2 -n cinder-conductor
+#    - tmux send-keys -t cinder:2 "{{ venv }}/cinder-conductor --config-file {{ conf_path }}/cinder.conf" C-m
+#    - tmux neww -t cinder:3 -n cinder-consoleauth
+#    - tmux send-keys -t cinder:3 "{{ venv }}/cinder-consoleauth --config-file {{ conf_path }}/cinder.conf" C-m
+#    - tmux neww -t cinder:4 -n cinder-novncproxy
+#    - tmux send-keys -t cinder:4 "{{ venv }}/cinder-novncproxy --config-file {{ conf_path }}/cinder.conf" C-m
+#  tags:
+#    - cinder-run
+#  when: inventory_hostname in groups['controller']
+#
+#- name: "Running cinder-compute in tmux"
+#  command: "{{ item }}"
+#  ignore_errors: true
+#  with_items:
+#    - tmux kill-session -t cinder
+#  tags:
+#    - cinder-run
+#    - cinder-computer-run
+#  when: inventory_hostname in groups['computer']
+#
+#- name: "Running cinder-compute in tmux"
+#  command: "{{ item }}"
+#  with_items:
+#    - tmux new -d -s cinder -n cinder-compute
+#    - tmux send-keys -t cinder:0 "{{ venv }}/cinder-compute --config-file {{ conf_path }}/cinder.conf" C-m
+#  tags:
+#    - cinder-run
+#    - cinder-computer-run
+#  when: inventory_hostname in groups['computer']
+#

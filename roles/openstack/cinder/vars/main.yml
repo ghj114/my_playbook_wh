@@ -1,0 +1,9 @@
+---
+# vars file for roles/openstack/cinder
+#
+
+
+#venv: /root/workspace/openstack/src/cinder/.tox/py27/bin
+#conf_path: /root/workspace/openstack/src/cinder/etc/cinder
+cinder_bin_path: "{{ cinder_developer_mode | bool | ternary(cinder_git_clone_dir ~ '/.tox/py27/bin/', '') }}"
+cinder_conf: "{{ cinder_developer_mode | bool | ternary(cinder_git_clone_dir ~ '/etc/cinder/cinder.conf', '/etc/cinder/cinder.conf') }}"

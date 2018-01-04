@@ -12,7 +12,7 @@
   tags:
     - ceph-client-installed
 
-- name: Copy yceph secret files to client
+- name: Copy ceph secret files to client
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"

@@ -26,4 +26,3 @@
   when: inventory_hostname in groups['computer']
   tags:
     - ntpdate-crontab
-

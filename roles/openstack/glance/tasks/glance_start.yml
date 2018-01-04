@@ -20,4 +20,3 @@
   tags:
     - glance-run
   when: inventory_hostname in groups['controller']
-

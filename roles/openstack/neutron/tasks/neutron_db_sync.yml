@@ -3,5 +3,5 @@
 - name: Neutron database sync
   command: "{{ item }}"
   with_items:
-    - "{{ neutron_bin_path ~ 'neutron-db-manage' }} --config-file {{ neutron_conf_path }}/neutron.conf --config-file {{ neutron_conf_path }}/plugins/ml2_conf.ini upgrade head"
+    - "{{ neutron_bin_path ~ 'neutron-db-manage' }} --config-file {{ neutron_conf_path }}/neutron.conf --config-file {{ neutron_conf_path }}/plugins/ml2/ml2_conf.ini upgrade head"
 

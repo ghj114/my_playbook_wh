@@ -1,5 +1,26 @@
 ---
 
+#- name: yum install dhcp
+#  yum install openstack-neutron
+#  systemctl enable neutron-dhcp-agent.service
+#  systemctl start neutron-dhcp-agent.service
+#  systemctl enable neutron-metadata-agent.service
+#  systemctl start neutron-metadata-agent.service
+
+- name: yum install openstack-neutron-controller
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openstack-neutron
+    - openstack-neutron-ml2
+    - openstack-neutron-openvswitch
+    - ebtables
+    - ipset
+  when: inventory_hostname in groups['controller']
+  tags:
+    - neutron-controller-install
+
 - name: yum install openstack-neutron-openvswitch
   yum:
     name: "{{ item }}"

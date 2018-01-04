@@ -29,8 +29,8 @@
 debug = true
 [agent]
 [ovs]
-#bridge_mappings = provider:br-provider
-bridge_mappings = br-provider:br-provider
+bridge_mappings = provider:br-provider
+#bridge_mappings = br-provider:br-provider
 [securitygroup]
 #firewall_driver = iptables_hybrid
 firewall_driver = neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
@@ -41,14 +41,5 @@ extension_drivers = port_security
 mechanism_drivers = openvswitch,linuxbridge
 [ml2_type_flat]
 flat_networks = provider
-
-
-[ml2]
-type_drivers = flat,vlan
-tenant_network_types =
-extension_drivers = port_security
-mechanism_drivers = openvswitch,linuxbridge
-[ml2_type_flat]
-flat_networks = provider
 [ml2_type_vlan]
-network_vlan_ranges = br-provider
+#network_vlan_ranges = br-provider

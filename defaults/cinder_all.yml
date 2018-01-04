@@ -1,0 +1,12 @@
+---
+
+cinder_mysql_user: cinder
+cinder_mysql_password: cinder
+cinder_mysql_database: cinder
+
+cinder_developer_mode: "{{ developer_mode }}"
+
+cinder_git_clone_dir: "{{ git_clone_dir }}/cinder"
+cinder_version: "stable/{{ openstack_release }}"
+cinder_log: "{{ log_dir ~ '/cinder'}}"
+cinder_conf_template: "cinder_pro.conf.j2"

@@ -1,0 +1,11 @@
+---
+
+- name: yum install cinder
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openstack-cinder
+  when: inventory_hostname in groups['controller']
+  tags:
+    - cinder-install

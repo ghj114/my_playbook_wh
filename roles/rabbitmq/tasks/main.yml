@@ -1,10 +1,10 @@
 ---
 # tasks file for roles/rabbitmq
 #
-- name: Install OpenStack repository
-  yum:
-    name: centos-release-openstack-ocata
-    state: present
+#- name: Install OpenStack repository
+#  yum:
+#    name: centos-release-openstack-ocata
+#    state: present
 
 #- name: upgrade all packages
 #  yum:
@@ -25,7 +25,7 @@
 - name: Add rabbitmq user
   rabbitmq_user:
     user: openstack
-    password: openstack
+    password: 123qwe
     vhost: /
     configure_priv: .*
     read_priv: .*

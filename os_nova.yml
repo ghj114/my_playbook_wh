@@ -2,21 +2,20 @@
   hosts: 
     #- controller
     - computer
-    #- test
   gather_facts: "{{ gather_facts | default(True) }}"
   max_fail_percentage: 0
   remote_user: root
-  pre_tasks:
-    - include: common-tasks/mysql-db-user.yml 
-      static: no
-      vars:
-        user_name: "{{ item.mysql_user }}"
-        password: "{{ item.password }}"
-        db_name: "{{ item.db_name }}"
-      with_items: 
-        - { mysql_user: "{{ nova_mysql_user }}", passwd: "{{ nova_mysql_password }}", db_name: "{{ nova_mysql_database }}" }
-        - { mysql_user: "{{ nova_api_mysql_user }}", passwd: "{{ nova_api_mysql_password }}", db_name: "{{ nova_api_mysql_database }}" }
-      when: "'mysql' in group_names" 
+  #pre_tasks:
+  #  - include: common-tasks/mysql-db-user.yml 
+  #    static: no
+  #    vars:
+  #      user_name: "{{ item.mysql_user }}"
+  #      password: "{{ item.password }}"
+  #      db_name: "{{ item.db_name }}"
+  #    with_items: 
+  #      - { mysql_user: "{{ nova_mysql_user }}", passwd: "{{ nova_mysql_password }}", db_name: "{{ nova_mysql_database }}" }
+  #      - { mysql_user: "{{ nova_api_mysql_user }}", passwd: "{{ nova_api_mysql_password }}", db_name: "{{ nova_api_mysql_database }}" }
+  #    when: "'mysql' in group_names" 
   roles:
     - role: hostname
     - role: system/yum
@@ -26,8 +25,9 @@
     - defaults/nova_all.yml
   vars:
     hostname_prefix: "{{ ('controller' in group_names ) | ternary('controller', 'computer') }}"
-    hostname_var: "{{ hostname_prefix ~ '-' ~ ansible_default_ipv4['address'].replace('.', '-') ~ '-TN' }}"
-    ntp_server: "10.100.63.11"
+    hostname_postfix: "WH"
+    hostname_var: "{{ hostname_prefix ~ '-' ~ ansible_default_ipv4['address'].replace('.', '-') ~ '-' ~ hostname_postfix }}"
+    ntp_server: "10.201.121.10"
     extra_repository: ["epel-release", "centos-release-openstack-{{ openstack_release }}"]
     #extra_packages: [git, vim, wget, bash-completion, iftop, net-tools, tcpdump, gcc, postgresql, postgresql-devel, python-devel, libffi-devel, python-devel, openssl-devel,  openldap-devel]
     extra_packages: [git, vim, wget, bash-completion, iftop, net-tools, tcpdump, telnet]

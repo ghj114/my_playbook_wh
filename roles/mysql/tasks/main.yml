@@ -32,9 +32,9 @@
     state: started
     enabled: true
 
-  #- name: Set root Password
-  #  mysql_user: name=root host="{{item}}" password=stackdb.123 state=present
-  #  with_items:
-  #    - localhost
-  #    - 127.0.0.1
-  #    - ::1
+#- name: Set root Password
+#  mysql_user: name=root host="{{item}}" password=stackdb.123 state=present
+#  with_items:
+#    - localhost
+#    - 127.0.0.1
+#    - ::1

@@ -18,11 +18,20 @@
 #  with_items: "{{ extra_repository }}"
 #  tags:
 #    - epel-remove
-- name: yum remove epel-release
-  command: "yum autoremove -y {{ item }}"
-  with_items: "{{ extra_repository }}"
-  tags:
-    - epel-remove
+#- name: yum remove epel-release
+#  command: "yum autoremove -y {{ item }}"
+#  with_items: "{{ extra_repository }}"
+#  tags:
+#    - epel-remove
+
+#- name: yum install epel-release
+#  yum:
+#    name: "{{ item }}"
+#    state: present
+#  with_items: "{{ extra_repository }}"
+#  tags:
+#    - epel-install
+
 
 - name: create a directory if it doesn't exist
   file:
@@ -39,21 +48,50 @@
 
 - name: Configure additional repos in /etc/yum.repos.d/
   template:
-    src: CentOS-aliyum.repo.j2
-    dest: /etc/yum.repos.d/CentOS-aliyum.repo
+    src: CentOS-Base.repo.j2
+    dest: /etc/yum.repos.d/CentOS-Base.repo
   tags:
-    - install-aliyum
+    - install-base
+
+- name: Configure additional repos in /etc/yum.repos.d/
+  template:
+    src: CentOS-OpenStack-newton.repo.j2
+    dest: /etc/yum.repos.d/CentOS-OpenStack-newton.repo
+  tags:
+    - install-newtonyum
+
+- name: Configure additional KEY in /etc/pki/rpm-gpg/
+  template:
+    src: RPM-GPG-KEY-CentOS-SIG-Cloud.j2
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-Cloud
+  tags:
+    - install-cloud
+
+- name: Configure additional KEY in /etc/pki/rpm-gpg/
+  template:
+    src: RPM-GPG-KEY-CentOS-SIG-Virtualization.j2
+    dest: /etc/pki/rpm-gpg/RPM-GPG-KEY-CentOS-SIG-Virtualization
+  tags:
+    - install-newtyum
+- name: Configure additional repos in /etc/yum.repos.d/
+  template:
+    src: CentOS-QEMU-EV.repo.j2
+    dest: /etc/yum.repos.d/CentOS-QEMU-EV.repo
+  tags:
+    - install-qemuyum
+
+
   #  notify:
   #  - Delete unmanaged repos
   #
+#- name: yum install epel-release
+#  yum:
+#    name: "{{ item }}"
+#    state: present
+#  with_items: "{{ extra_repository }}"
+#  tags:
+#    - epel-install
 
-- name: yum install epel-release
-  yum:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{ extra_repository }}"
-  tags:
-    - epel-install
 
 - name: upgrade all packages
   yum:

@@ -1,0 +1,9 @@
+---
+
+
+- name: Cinder database sync
+  command: "{{ item }}"
+  with_items:
+    - "{{ cinder_bin_path ~ 'cinder-manage' }} --config-file {{ cinder_conf }} db sync"
+
+

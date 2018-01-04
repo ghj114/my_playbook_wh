@@ -1,0 +1,79 @@
+[DEFAULT]
+my_ip={{ inventory_hostname }}
+backup_ceph_conf = /etc/ceph/ceph.conf
+backup_ceph_user = cinder
+backup_ceph_chunk_size = 134217728
+
+backup_ceph_pool = test_pool
+
+backup_ceph_stripe_unit = 0
+backup_ceph_stripe_count = 0
+restore_discard_excess_bytes = true
+glance_api_servers = http://{{ groups['controller'][0] }}:9292
+glance_api_version = 2
+auth_strategy = keystone
+
+rbd_pool = test_pool
+
+rbd_user = admin
+rbd_ceph_conf = /etc/ceph/ceph.conf
+rbd_flatten_volume_from_snapshot = false
+rbd_secret_uuid = 41ee13fe-69ed-45d0-8f4b-e3c03f1a4ad5
+rbd_max_clone_depth = 5
+rbd_store_chunk_size = 4
+rados_connect_timeout = -1
+backup_driver = cinder.backup.drivers.ceph
+volume_driver = cinder.volume.drivers.rbd.RBDDriver
+volume_group = cinder-volumes
+volume_copy_bps_limit = 26214400
+debug = true
+rpc_backend = rabbit
+osapi_volume_workers = 6
+state_path = /data/cinder
+
+[BACKEND]
+[BRCD_FABRIC_EXAMPLE]
+[CISCO_FABRIC_EXAMPLE]
+[COORDINATION]
+[FC-ZONE-MANAGER]
+[KEYMGR]
+[cors]
+[cors.subdomain]
+
+[database]
+connection = mysql+pymysql://{{ cinder_mysql_user }}:{{ cinder_mysql_password }}@{{ groups['controller'][0] }}/cinder
+
+[keystone_authtoken]
+auth_uri = http://{{ groups['keystone'][0] }}:5000
+auth_url = http://{{ groups['keystone'][0] }}:35357
+memcached_servers = {{ groups['controller'][0] }}:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = cinder
+password = cinder
+
+[matchmaker_redis]
+
+[oslo_concurrency]
+lock_path = /var/lib/cinder/tmp
+
+[oslo_messaging_amqp]
+[oslo_messaging_notifications]
+
+[oslo_messaging_rabbit]
+rabbit_hosts={{ groups['controller'][0] }}:5672
+rabbit_retry_interval=1
+rabbit_retry_backoff=2
+rabbit_max_retries=0
+rabbit_durable_queues=true
+rabbit_ha_queues=true
+rabbit_userid = openstack
+rabbit_password = 123qwe
+
+[oslo_middleware]
+[oslo_policy]
+[oslo_reports]
+[oslo_versionedobjects]
+[ssl]

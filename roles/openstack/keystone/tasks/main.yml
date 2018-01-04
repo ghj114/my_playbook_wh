@@ -7,6 +7,12 @@
   tags:
     - keystone-developer-install
 
+- include: keystone_yum_install.yml
+  static: no
+  when: keystone_developer_mode | bool == false
+  tags:
+    - keystone-yum-install
+
 - include: keystone_config.yml
   static: no
   tags:
@@ -14,22 +20,22 @@
 
 - include: keystone_db_sync.yml
   static: no
-  when: inventory_hostname in groups['controller']
+  when: inventory_hostname in groups['keystone']
   tags:
     - keystone-db-sync
 
 
-- include: keystone_start.yml
-  static: no
-  when: inventory_hostname in groups['controller']
-  tags:
-    - keystone-start
+#- include: keystone_start.yml
+#  static: no
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - keystone-start
 
-- include: keystone_keystone_data.yml
-  static: no
-  when: inventory_hostname in groups['controller']
-  tags:
-    - keystone-keystone-data
+#- include: keystone_keystone_data.yml
+#  static: no
+#  when: inventory_hostname in groups['controller']
+#  tags:
+#    - keystone-keystone-data
 
 
 #- name: Create a new database with name 'keystone'

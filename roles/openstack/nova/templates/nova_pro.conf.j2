@@ -1,0 +1,92 @@
+[DEFAULT]
+my_ip={{ inventory_hostname }}
+auth_strategy=keystone
+allow_resize_to_same_host=true
+cpu_allocation_ratio=6.0
+ram_allocation_ratio = 0.9
+instances_path = /data/_openstack/nova/instances
+resume_guests_state_on_host_boot=true
+use_neutron=true
+scheduler_default_filters=RetryFilter,AvailabilityZoneFilter,RamFilter,DiskFilter,ComputeFilter,ComputeCapabilitiesFilter,ImagePropertiesFilter,ServerGroupAntiAffinityFilter,ServerGroupAffinityFilter
+scheduler_weight_classes=nova.scheduler.weights.metrics.MetricsWeigher,nova.scheduler.weights.ram.RAMWeigher,nova.scheduler.weights.affinity.ServerGroupSoftAntiAffinityWeigher
+enabled_apis=osapi_compute,metadata
+firewall_driver = nova.virt.firewall.NoopFirewallDriver
+debug=true
+transport_url = rabbit://openstack:123qwe@{{ groups['controller'][0] }}
+osapi_compute_workers=4
+metadata_workers=4
+[api_database]
+connection = mysql+pymysql://{{ nova_api_mysql_user }}:{{ nova_api_mysql_password }}@{{ groups['controller'][0] }}/nova_api
+[barbican]
+[cache]
+[cells]
+[cinder]
+[cloudpipe]
+[conductor]
+workers=4
+[cors]
+[cors.subdomain]
+[crypto]
+[database]
+connection = mysql+pymysql://{{ nova_mysql_user }}:{{ nova_mysql_password }}@{{ groups['controller'][0] }}/nova
+[ephemeral_storage_encryption]
+[glance]
+api_servers = http://{{ groups['glance'][0] }}:9292
+[guestfs]
+[hyperv]
+[image_file_url]
+[ironic]
+[key_manager]
+[keystone_authtoken]
+auth_uri = http://{{ groups['keystone'][0] }}:5000
+auth_url = http://{{ groups['keystone'][0] }}:35357
+memcached_servers = {{ groups['controller'][0] }}:11211
+auth_type = password
+project_domain_name = Default
+user_domain_name = Default
+project_name = service
+username = nova
+password = nova
+[libvirt]
+[matchmaker_redis]
+[metrics]
+[mks]
+[neutron]
+url = http://{{ groups['controller'][0] }}:9696
+auth_url = http://{{ groups['controller'][0] }}:35357
+auth_type = password
+project_domain_name = Default
+user_domain_name = Default
+region_name = RegionOne
+project_name = service
+username = neutron
+password = neutron
+service_metadata_proxy = True
+[osapi_v21]
+[oslo_concurrency]
+lock_path=/var/lib/nova/tmp
+[oslo_messaging_amqp]
+[oslo_messaging_notifications]
+[oslo_messaging_rabbit]
+[oslo_messaging_zmq]
+[oslo_middleware]
+[oslo_policy]
+[placement]
+[placement_database]
+[rdp]
+[remote_debug]
+[serial_console]
+[spice]
+[ssl]
+[trusted_computing]
+[upgrade_levels]
+[vmware]
+[vnc]
+enabled=true
+vncserver_listen=0.0.0.0
+vncserver_proxyclient_address=$my_ip
+novncproxy_base_url=http://{{ groups['controller'][0] }}:6080/vnc_auto.html
+[workarounds]
+[wsgi]
+[xenserver]
+[xvp]

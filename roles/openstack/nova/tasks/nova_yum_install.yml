@@ -1,5 +1,19 @@
 ---
 
+- name: yum install nova-controller
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openstack-nova-api
+    - openstack-nova-scheduler
+    - openstack-nova-conductor
+    - openstack-nova-console
+    - openstack-nova-novncproxy
+  when: inventory_hostname in groups['controller']
+  tags:
+    - nova-controller-installed
+
 - name: yum install nova-compute
   yum:
     name: "{{ item }}"

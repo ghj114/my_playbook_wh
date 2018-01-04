@@ -3,8 +3,8 @@
 nova_mysql_user: nova
 nova_mysql_password: nova
 nova_mysql_database: nova
-nova_api_mysql_user: nova_api
-nova_api_mysql_password: nova_api
+nova_api_mysql_user: nova
+nova_api_mysql_password: nova
 nova_api_mysql_database: nova_api
 #nova_mysql_address: 10.100.19.233
 
@@ -14,7 +14,7 @@ nova_git_clone_dir: "{{ git_clone_dir }}/nova"
 novnc_git_clone_dir: "{{ git_clone_dir }}/noVNC"
 nova_version: "stable/{{ openstack_release }}"
 nova_log: "{{ log_dir ~ '/nova'}}"
-nova_conf_template: "nova_tn_pro.conf.j2"
+nova_conf_template: "nova_pro.conf.j2"
 
 
 

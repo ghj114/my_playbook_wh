@@ -1,0 +1,6 @@
+---
+- name: init
+  hosts: [10.100.63.39]
+  tasks:
+    - include: os_nova.yml
+#    - include: os_neutron.yml

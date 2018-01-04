@@ -1,0 +1,13 @@
+---
+
+- name: yum install glance
+  yum:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openstack-glance
+  when: inventory_hostname in groups['glance']
+  tags:
+    - glance-install
+
+

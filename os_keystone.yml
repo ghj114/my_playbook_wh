@@ -11,8 +11,14 @@
         user_name: "{{ keystone_mysql_user }}"
         password: "{{ keystone_mysql_password }}"
         db_name: "{{ keystone_mysql_database }}"
+      #vars:
+      #  user_name: "{{ item.mysql_user }}"
+      #  password: "{{ item.password }}"
+      #  db_name: "{{ item.db_name }}"
+      #with_items:
+      #  - { mysql_user: "{{ keystone_mysql_user }}", password: "{{ keystone_mysql_password }}", db_name: "{{ keystone_mysql_database }}" }
+      #when: "'mysql' in group_names"
       when: inventory_hostname == groups['mysql'][0] 
-
   roles:
     - role: openstack/keystone
   vars_files:

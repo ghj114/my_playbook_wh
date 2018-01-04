@@ -5,7 +5,7 @@
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: "root"
-    group: "{{ glance_developer_mode | bool | ternary('root', 'nova') }}"
+    group: "{{ glance_developer_mode | bool | ternary('root', 'glance') }}"
     mode: "0640"
     backup: "yes"
   with_items:

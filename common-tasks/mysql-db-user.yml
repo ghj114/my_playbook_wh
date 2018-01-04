@@ -44,7 +44,10 @@
     host: "{{ item }}"
     state: "present"
     priv: "{{ db_name }}.*:ALL"
-    append_privs: "{{ db_append_privs | default(omit) }}"
-  with_items: "{{ grant_list | default(['localhost', '%']) }}"
+    append_privs: "{{ db_append_privs | default(true) }}"
+  with_items: "{{ grant_list | default([['localhost'], ['%']]) }}"
+  #with_items:
+  #  - 'localhost'
+  #  - '%'
   tags:
     - common-mysql

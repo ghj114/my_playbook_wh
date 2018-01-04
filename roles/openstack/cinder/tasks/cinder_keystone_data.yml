@@ -1,0 +1,26 @@
+---
+
+- name: Delete the cinder data
+  command: "{{ item }}"
+  ignore_errors: true
+  with_items:
+      - "{{ openstack_bin }} {{keystone_admin_env}} user delete cinder"
+      - "{{ openstack_bin }} {{keystone_admin_env}} service delete cinder"
+
+- name: Create the cinder data
+  command: "{{ item }}"
+  with_items:
+      - "{{ openstack_bin }} {{keystone_admin_env}} user create --domain default --password cinder cinder"
+      - "{{ openstack_bin }} {{keystone_admin_env}} role add --project service --user cinder admin"
+      - "{{ openstack_bin }} {{keystone_admin_env}} service create --name cinder --description 'OpenStack Cinder' volume"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne cinder public http://{{groups['controller'][0]}}:8776/v1/%(tenant_id)s"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne cinder internal http://{{groups['controller'][0]}}:8776/v1/%(tenant_id)s"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne cinder admin http://{{groups['controller'][0]}}:8776/v1/%(tenant_id)s"
+      - "{{ openstack_bin }} {{keystone_admin_env}} service create --name cinderv2 --description 'OpenStack Cinder' volumev2"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne cinderv2 public http://{{groups['controller'][0]}}:8776/v2/%(tenant_id)s"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne cinderv2 internal http://{{groups['controller'][0]}}:8776/v2/%(tenant_id)s"
+      - "{{ openstack_bin }} {{keystone_admin_env}} endpoint create --region RegionOne cinderv2 admin http://{{groups['controller'][0]}}:8776/v2/%(tenant_id)s"
+
+
+
+

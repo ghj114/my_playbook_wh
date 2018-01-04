@@ -1,0 +1,58 @@
+[DEFAULT]
+dhcp_lease_duration = -1
+api_workers = 4
+transport_url = rabbit://openstack:123qwe@{{ groups['controller'][0] }}
+rpc_backend = rabbit
+verbose=true
+notify_nova_on_port_data_changes = True
+notify_nova_on_port_status_changes = True
+auth_strategy = keystone
+allow_overlapping_ips = True
+debug = True
+service_plugins = neutron.services.l3_router.l3_router_plugin.L3RouterPlugin,neutron.services.metering.metering_plugin.MeteringPlugin
+core_plugin = neutron.plugins.ml2.plugin.Ml2Plugin
+bind_host = 0.0.0.0
+use_syslog = False
+log_dir = /var/log/neutron/
+[agent]
+[cors]
+[cors.subdomain]
+[database]
+connection = mysql+pymysql://neutron:neutron@{{ groups['controller'][0] }}/neutron
+[keystone_authtoken]
+auth_uri = http://{{ groups['keystone'][0] }}:5000
+auth_url = http://{{ groups['keystone'][0] }}:35357
+memcached_servers = {{ groups['controller'][0] }}:11211
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+project_name = service
+username = neutron
+password = neutron
+[matchmaker_redis]
+[nova]
+auth_url = http://{{ groups['keystone'][0] }}:35357
+auth_type = password
+project_domain_name = default
+user_domain_name = default
+region_name = RegionOne
+project_name = service
+username = nova
+password = nova
+[oslo_concurrency]
+lock_path = /var/lib/neutron/tmp
+[oslo_messaging_amqp]
+[oslo_messaging_notifications]
+[oslo_messaging_rabbit]
+rabbit_hosts={{ groups['controller'][0] }}:5672,
+rabbit_retry_interval=1
+rabbit_retry_backoff=2
+rabbit_max_retries=0
+rabbit_durable_queues=true
+rabbit_ha_queues=true
+rabbit_userid = openstack
+rabbit_password = 123qwe
+[oslo_policy]
+[quotas]
+[ssl]
+[qos]

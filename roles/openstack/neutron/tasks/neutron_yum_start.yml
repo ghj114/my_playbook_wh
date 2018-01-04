@@ -14,6 +14,20 @@
   tags:
     - iptables-config
 
+- name: Start openstack-neutron-controller.service
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: True
+  with_items:
+    - neutron-server.service
+    - neutron-openvswitch-agent.service
+    - neutron-dhcp-agent.service
+    - neutron-metadata-agent.service
+  when: inventory_hostname in groups['controller']
+  tags:
+    - neutron-controller-start
+
 - name: Start iptables and openvswithc
   systemd:
     name: "{{ item }}"
@@ -30,7 +44,7 @@
     - ovs-vsctl --if-exists del-br br-provider
     - ovs-vsctl add-br br-provider
     #- ovs-vsctl add-port br-provider em4
-    - ovs-vsctl add-bond br-provider bond0 em3 em4
+    - ovs-vsctl add-bond br-provider bond0 "{{ interface[0] }}" "{{ interface[1] }}"
   tags:
     - ovs-create-bridge
   when: inventory_hostname in groups['computer']

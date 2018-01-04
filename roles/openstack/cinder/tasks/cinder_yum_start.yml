@@ -1,0 +1,14 @@
+---
+- name: Start openstack-cinder
+  systemd:
+    name: "{{ item }}"
+    state: started
+    enabled: True
+  with_items:
+    - openstack-cinder-api.service
+    - openstack-cinder-scheduler.service
+    - openstack-cinder-volume.service
+  when: inventory_hostname in groups['controller']
+  tags:
+    - cinder-start
+

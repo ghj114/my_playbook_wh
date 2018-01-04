@@ -5,7 +5,7 @@
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
     owner: "root"
-    group: "{{ keystone_developer_mode | bool | ternary('root', 'nova') }}"
+    group: "{{ keystone_developer_mode | bool | ternary('root', 'keystone') }}"
     mode: "0640"
     backup: "yes"
   with_items:
